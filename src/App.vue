@@ -18,6 +18,10 @@ export default {
 };
 </script>
 <style lang="scss">
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 @font-face {
   font-family: 'maple';
   src: url('./assets/fonts/MaplestoryLight.ttf');

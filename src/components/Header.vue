@@ -59,6 +59,9 @@ export default {
   background: linear-gradient(to right, #2989d8 0, #b524b5 52%, #f4af84 100%);
   box-shadow: 0 0 6px rgb(0 0 0 / 40%);
   color: #fff;
+  height: 4rem;
+  display: flex;
+  align-items: center;
 }
 .search-icon {
   position: absolute;
