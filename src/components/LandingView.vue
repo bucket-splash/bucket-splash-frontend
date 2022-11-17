@@ -14,7 +14,7 @@
     </div>
     <div class="second-section bg-container scroll-section">
       <!-- <p>&copy; SSAFY 8기 박이령 하훈목</p> -->
-      <b-iconstack animation="cylon-vertical" font-scale="2" rotate="90">
+      <b-iconstack font-scale="2" rotate="90">
         <b-icon stacked icon="chevron-right" shift-h="-4"></b-icon>
         <b-icon stacked icon="chevron-right" shift-h="0"></b-icon>
         <b-icon stacked icon="chevron-right" shift-h="4"></b-icon>
@@ -66,7 +66,13 @@ export default {
       delay: 2.9,
       duration: 0.4,
       opacity: 0,
-      x: 30,
+    });
+    gsap.from('.b-iconstack', {
+      duration: 2,
+      repeat: -1,
+      keyframes: {
+        y: [-10, 10, -10],
+      },
     });
   },
 };
