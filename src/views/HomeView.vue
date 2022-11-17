@@ -2,7 +2,7 @@
   <div>
     <LandingView />
     <div class="wrapper">
-      <div class="item-container">
+      <div class="item-container" ref="buckets">
         <div class="bucket-container" v-for="(item, i) in buckets" :key="i">
           <img :src="item.bucket.imageUrl" class="thumbnail" />
           <div class="bucket-content">
@@ -27,6 +27,11 @@
           </div>
         </div>
       </div>
+      <InfiniteLoading
+        v-if="!isLoading"
+        @infinite="infiniteHandler"
+        spinner="waveDots"
+      ></InfiniteLoading>
     </div>
   </div>
 </template>
@@ -34,13 +39,34 @@
 <script>
 import LandingView from '@/components/LandingView.vue';
 import axios from 'axios';
+import gsap from 'gsap';
+import InfiniteLoading from 'vue-infinite-loading';
+
 export default {
   name: 'HomeView',
-  components: { LandingView },
+  components: { LandingView, InfiniteLoading },
   data() {
     return {
       buckets: [],
+      isLoading: false,
     };
+  },
+  methods: {
+    async infiniteHandler($state) {
+      const { data } = await axios({
+        method: 'GET',
+        url: 'http://localhost:8080/items.json',
+      });
+      this.buckets = [...this.buckets, ...data.buckets];
+      console.log($state);
+      if (this.buckets.length > 100) {
+        $state.complete();
+        return;
+      }
+      $state.loaded();
+
+      console.log('hello');
+    },
   },
   async created() {
     const { data } = await axios({
@@ -48,8 +74,27 @@ export default {
       url: 'http://localhost:8080/items.json',
     });
     this.buckets = data.buckets;
-    console.log(this.buckets);
   },
+  // watch: {
+  //   async buckets() {
+  //     await this.$nextTick();
+  //     console.log('Mounted', document.querySelectorAll('.bucket-container'));
+  //     gsap.from(this.$refs.buckets.childNodes, {
+  //       scrollTrigger: {
+  //         trigger: this.$refs.buckets,
+  //       },
+  //       duration: 1,
+  //       scale: 0.1,
+  //       opacity: 0,
+  //       y: 40,
+  //       ease: 'power1.inOut',
+  //       stagger: {
+  //         amount: 0.5,
+  //       },
+  //       onComplete: () => (this.isLoading = false),
+  //     });
+  //   },
+  // },
 };
 </script>
 
@@ -68,6 +113,7 @@ export default {
 }
 .wrapper {
   background-color: $blue;
+  padding-bottom: 10vh;
 }
 .item-container {
   max-width: 90rem;
