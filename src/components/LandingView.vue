@@ -10,10 +10,15 @@
       </div>
     </div>
     <div class="first-section bg-container scroll-section">
-      <p>&copy; SSAFY 8기 박이령 하훈목</p>
+      <p>겨울이 오면 봄이 멀지 않으리</p>
     </div>
     <div class="second-section bg-container scroll-section">
-      <p>&copy; SSAFY 8기 박이령 하훈목</p>
+      <!-- <p>&copy; SSAFY 8기 박이령 하훈목</p> -->
+      <b-iconstack animation="cylon-vertical" font-scale="2" rotate="90">
+        <b-icon stacked icon="chevron-right" shift-h="-4"></b-icon>
+        <b-icon stacked icon="chevron-right" shift-h="0"></b-icon>
+        <b-icon stacked icon="chevron-right" shift-h="4"></b-icon>
+      </b-iconstack>
     </div>
   </div>
 </template>
@@ -57,12 +62,21 @@ export default {
       duration: 1.2,
       clipPath: 'circle(435px)',
     });
+    gsap.from('.b-iconstack', {
+      delay: 2.9,
+      duration: 0.4,
+      opacity: 0,
+      x: 30,
+    });
   },
 };
 </script>
 
 <style lang="scss" scoped>
 @import '../style/colors.scss';
+.b-iconstack {
+  color: $lightGray;
+}
 .bg-container {
   width: 100vw;
   height: 100vh;
@@ -70,6 +84,7 @@ export default {
 }
 .second-section {
   z-index: 9;
+  padding-top: calc(5vh - 1rem);
 }
 .first-section {
   background-color: $lightGray;
