@@ -2,15 +2,17 @@
   <div>
     <div class="wrapper">
       <div class="item-container" ref="buckets">
-        <div class="bucket-container" v-for="(item, i) in buckets" :key="i">
-          <img :src="item.bucket.imageUrl" class="thumbnail" />
-          <div class="bucket-content">
-            <h1>{{ item.bucket.title }}</h1>
-            <p class="bucket-text">{{ item.bucket.content }}</p>
-            <p class="bucket-time">
-              {{ item.bucket.createdAt }} · {{ item.bucket.commentCnt }}개의
-              댓글
-            </p>
+        <div class="bucket-container" v-for="(item, i) in boards" :key="i">
+          <div @click="() => handleClick(i)">
+            <img :src="item.bucket.imageUrl" class="thumbnail" />
+            <div class="bucket-content">
+              <h1>{{ item.bucket.title }}</h1>
+              <p class="bucket-text">{{ item.bucket.content }}</p>
+              <p class="bucket-time">
+                {{ item.bucket.createdAt }} · {{ item.bucket.commentCnt }}개의
+                댓글
+              </p>
+            </div>
           </div>
           <div class="divider"></div>
           <div class="bucket-footer">
@@ -36,9 +38,10 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
 import gsap from 'gsap';
 import InfiniteLoading from 'vue-infinite-loading';
+import { mapState } from 'vuex';
+
 export default {
   name: 'InfiniteBoard',
   components: { InfiniteLoading },
@@ -46,52 +49,47 @@ export default {
     return {
       buckets: [],
       isLoading: false,
-      limit: 6,
+      limit: 12,
     };
   },
   methods: {
     async infiniteHandler($state) {
-      const { data } = await axios({
-        method: 'GET',
-        url: 'http://localhost:8080/items.json',
-      });
-      this.buckets = [...this.buckets, ...data.buckets];
-      console.log($state);
-      if (this.buckets.length > 100) {
-        $state.complete();
-        return;
-      }
+      await this.$store.dispatch('boardStore/getBoardList');
       $state.loaded();
-
-      console.log('hello');
+    },
+    handleClick(id) {
+      this.$router.push(`board/${id}`);
     },
   },
   async created() {
-    const { data } = await axios({
-      method: 'GET',
-      url: 'http://localhost:8080/items.json',
-    });
-    this.buckets = data.buckets;
+    if (this.boards.length < 1) {
+      this.$store.dispatch('boardStore/getBoardList');
+    }
   },
+  computed: {
+    ...mapState('boardStore', ['boards']),
+  },
+
   watch: {
-    async buckets(newValue, oldValue) {
+    async boards(newValue, oldValue) {
       await this.$nextTick();
       gsap.from(this.$refs.buckets.childNodes, {
         scrollTrigger: {
           trigger: this.$refs.buckets,
           start: 'top 50%',
         },
-
         scale: 0.1,
         opacity: 0,
         y: 40,
         ease: 'power1.inOut',
         duration: (index) => {
-          const delay = index / 6 - (newValue.length - 6) / 6;
+          const delay =
+            index / this.limit - (newValue.length - this.limit) / this.limit;
           return delay >= 0 ? 0.6 : 0;
         },
         stagger: (index) => {
-          const delay = index / 6 - (newValue.length - 6) / 6;
+          const delay =
+            index / this.limit - (newValue.length - this.limit) / this.limit;
           return delay >= 0 ? delay : 0;
         },
         onStart: () => (this.isLoading = true),

@@ -1,0 +1,45 @@
+{
+  "user": {
+    "name": "박이롱",
+    "avatarUrl": "https://mblogthumb-phinf.pstatic.net/MjAyMDAyMDdfMTYw/MDAxNTgxMDg1NzUxMTUy.eV1iEw2gk2wt_YqPWe5F7SroOCkXJy2KFwmTDNzM0GQg.Z3Kd5MrDh07j86Vlb2OhAtcw0oVmGCMXtTDjoHyem9og.JPEG.7wayjeju/%EB%B0%B0%EC%9A%B0%ED%94%84%EB%A1%9C%ED%95%84%EC%82%AC%EC%A7%84_IMG7117.jpg?type=w800"
+  },
+  "bucket": {
+    "id": 4,
+    "title": "한달동안 서핑 배우기",
+    "content": "자연 속에서 즐기는 스포츠다 보니 어쩔 수 없는 상황이 많이 생깁니다.\n내가 어렵게 시간을 내서 갔다고 해서 그날 내가 원하는 파도가 있을 수 없습니다. \n몇 번 겪다 보니 마음을 비우게 됩니다.\n영상을 찾아보다 보니 서퍼는 파도가 없을 때 시간을 잘 보내야 한다고 하더라고요. \n그리고 이제는 그나마 제가 원하는 파도를 찾아 떠나는 단계는 온 것 같습니다. 🤙\n아직 여름이 끝나지도 않았는데 가을이 기대되고 겨울이 기대되네요.",
+    "images": [
+      "https://www.sisain.co.kr/news/photo/201904/34409_67121_3441.jpg",
+      "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2FKsKXQ%2FbtrIXXFU34R%2FRKMkni8bsM48jm3ZSepFFk%2Fimg.png",
+      "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2FnOXL9%2FbtrIVh6sNpH%2F4GCPtnJJBUdupqgXd7Hs51%2Fimg.jpg"
+    ],
+    "createdAt": "2021-04-19T14:02:18.809Z",
+    "commentCnt": 3,
+    "likeCnt": 273
+  },
+  "comments": [
+    {
+      "user": {
+        "name": "상훈목",
+        "avatarUrl": "hhttps://ibighit.com/bts/images/bts/profile/member-v.jpg"
+      },
+      "comment": "우와 너무 멋져요~~ 저도 다음에 꼭 가보고 싶어요",
+      "createdAt": "2021-04-20T14:02:18.809Z"
+    },
+    {
+      "user": {
+        "name": "중훈목",
+        "avatarUrl": "hhttps://ibighit.com/bts/images/bts/profile/member-v.jpg"
+      },
+      "comment": "포스팅 잘 보고 갑니다 ㅎㅎ",
+      "createdAt": "2021-04-21T18:02:18.809Z"
+    },
+    {
+      "user": {
+        "name": "하훈목",
+        "avatarUrl": "hhttps://ibighit.com/bts/images/bts/profile/member-v.jpg"
+      },
+      "comment": "박이롱님, 포스팅 잘써주셔서 감사합니다. 잘보고 가고, 행복한 하루 되세요 :)",
+      "createdAt": "2021-04-21T21:02:18.809Z"
+    }
+  ]
+}
