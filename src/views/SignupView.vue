@@ -2,7 +2,7 @@
   <div class="wrapper py-5">
     <section class="container">
       <div class="inner-wrapper">
-        <h1>로그인</h1>
+        <h1>회원가입</h1>
 
         <form
           style="
@@ -30,7 +30,7 @@
             <input
               type="password"
               class="form__field"
-              placeholder="Name"
+              placeholder="비밀번호"
               name="password"
               id="password"
               v-model="password"
@@ -38,8 +38,23 @@
             />
             <label for="password" class="form__label">비밀번호</label>
           </div>
+
+          <div class="form__group field">
+            <input
+              type="password"
+              class="form__field"
+              placeholder="비밀번호 확인"
+              name="confirmPassword"
+              id="confirmPassword"
+              v-model="confirmPassword"
+              required
+            />
+            <label for="confirmPassword" class="form__label"
+              >비밀번호확인</label
+            >
+          </div>
           <button class="button-26 my-4" :disabled="isLoading" role="button">
-            로그인
+            회원가입
           </button>
         </form>
         <div class="divider"></div>
@@ -55,8 +70,8 @@
         </button>
 
         <p>
-          아직 회원이 아니신가요?
-          <router-link to="signup">회원가입</router-link>
+          이미 회원이 아니신가요?
+          <router-link to="login">로그인</router-link>
         </p>
       </div>
     </section>
@@ -66,10 +81,12 @@
 import axios from 'axios';
 
 export default {
+  name: 'SignupView',
   data() {
     return {
       email: '',
       password: '',
+      confirmPassword: '',
       isLoading: false,
     };
   },
@@ -84,47 +101,26 @@ export default {
   methods: {
     async handleSubmit(e) {
       e.preventDefault();
-      this.isLoading = true;
-      const { data } = await axios({
-        url: 'http://192.168.35.100:8080/user/login',
-        method: 'POST',
-        data: {
-          email: this.email,
-          password: this.password,
-        },
+      this.$toast.open({
+        message: `${this.email}는 이미 존재하는 이메일 입니다`,
+        type: 'error',
       });
-      if (data.message === 'fail') {
-        alert('유저정보를 확인해주세요');
-      } else {
-        this.$store.dispatch('userStore/login', {
-          token: data.accessToken,
-          userInfo: data.userInfo,
-        });
-        this.$router.push('/');
-      }
-      this.isLoading = false;
     },
     async kakaoLogin() {
       window.Kakao.Auth.login({
-        success: async () => {
+        success: function async() {
           window.Kakao.API.request({
             url: '/v2/user/me',
-            success: async (res) => {
+            success: async function (res) {
               // todo 카카오 로그인 api
               // const { data } = await axios({});
               // this.$store.dispatch('login', {
               //   data: { token: data.accessToken },
               //   userInfo: data.userInfo,
               // });
-              this.$store.dispatch('userStore/login', {
-                token: 'kakao-token',
-                userInfo: {
-                  email: res.id,
-                  nickname: res.properties.nickname,
-                  img: res.properties.profile_image,
-                },
+              this.$store.dispatch('login', {
+                data: { token: 'kakao-token', userInfo: {} },
               });
-              this.$router.push('/');
               return res;
             },
           });

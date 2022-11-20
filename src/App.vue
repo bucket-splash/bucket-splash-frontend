@@ -8,7 +8,7 @@
 <script>
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-
+import jwtDecode from 'jwt-decode';
 export default {
   name: 'App',
   components: {
@@ -16,8 +16,8 @@ export default {
     Footer,
   },
   created() {
-    const token = localStorage.getItem('ssafy-token');
-    token && this.$store.dispatch('userStore/getInfoByToken', token);
+    const { email } = jwtDecode(localStorage.getItem('ssafy-token'));
+    console.log(email);
   },
 };
 </script>

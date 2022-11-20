@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="header-container">
+  <div @click="test" class="header-container">
     <div class="container">
       <img
         src="https://www.peengler.com/wp-content/uploads/logo-de-peengler.png"
@@ -7,12 +7,15 @@
         style="cursor: pointer"
         @click="() => this.$router.push('/')"
       />
-      <b-nav>
+      <b-nav style="align-items: center">
         <b-nav-item @click="() => this.$router.push('/recruit')"
           >모집중</b-nav-item
         >
         <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')"
           >로그인</b-nav-item
+        >
+        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/signup')"
+          >회원가입</b-nav-item
         >
         <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
           >우리팀</b-nav-item
@@ -23,9 +26,9 @@
         <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
           >내버킷</b-nav-item
         >
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/login')"
-          >프로필</b-nav-item
-        >
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/profile')"
+          ><img :src="userInfo.img" style="height: 2rem; border-radius: 50%"
+        /></b-nav-item>
 
         <b-nav-form style="position: relative">
           <b-form-input
@@ -65,6 +68,9 @@ export default {
       gsap.to('.search-icon', {
         color: this.active ? '#fff' : '#000',
       });
+    },
+    test() {
+      console.log(this.$store.state.userStore.userInfo);
     },
   },
   computed: {

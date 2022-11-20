@@ -14,17 +14,9 @@ const userStore = {
     userInfo: null,
   },
   actions: {
-    async login({ state }, user) {
-      const { data } = await axios({
-        url: 'http://localhost:8080/loginSucess.json',
-        method: 'get',
-        params: { id: user.id },
-      });
-      if (data.ok) {
-        localStorage.setItem('ssafy-token', data.token);
-        state.userInfo = data.userInfo;
-      }
-      console.log(data);
+    login({ state }, data) {
+      localStorage.setItem('ssafy-token', data.token);
+      state.userInfo = data.userInfo;
     },
     logout({ state }) {
       localStorage.removeItem('ssafy-token');
