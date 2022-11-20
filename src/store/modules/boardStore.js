@@ -6,18 +6,30 @@ const boardStore = {
     boards: [],
     boardDetail: null,
   },
-  getters: {},
-
   actions: {
     getBoardList: async ({ state }, page) => {
       const { data } = await axios({
         method: 'GET',
         url: 'http://localhost:8080/items.json',
-        params: page,
+        params: { page },
       });
-      state.boards = [...state.boards, ...data.buckets];
+      if (state.boards.length > 50) {
+        return false;
+      } else if (data) {
+        state.boards = [...state.boards, ...data.buckets];
+        return true;
+      } else {
+        return false;
+      }
     },
-    getBoardDetail: ({ state }, id) => {},
+    getBoardDetail: async ({ state }, id) => {
+      const { data } = await axios({
+        method: 'GET',
+        url: 'http://localhost:8080/detailItem.json',
+        params: { id },
+      });
+      state.boardDetail = data;
+    },
   },
 };
 

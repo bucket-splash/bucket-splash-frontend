@@ -10,6 +10,7 @@ export default {
 @import '../style/colors.scss';
 
 .footer-container {
+  height: 4rem;
   padding: 1rem;
   background-color: $lightGray;
   font-family: 'maple';

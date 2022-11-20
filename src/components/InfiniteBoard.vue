@@ -54,8 +54,14 @@ export default {
   },
   methods: {
     async infiniteHandler($state) {
-      await this.$store.dispatch('boardStore/getBoardList');
-      $state.loaded();
+      console.log($state);
+      const result = await this.$store.dispatch('boardStore/getBoardList', 1);
+      if (result) {
+        $state.loaded();
+        return;
+      }
+      $state.complete();
+      this.isLoading = true;
     },
     handleClick(id) {
       this.$router.push(`board/${id}`);
@@ -63,9 +69,10 @@ export default {
   },
   async created() {
     if (this.boards.length < 1) {
-      this.$store.dispatch('boardStore/getBoardList');
+      this.$store.dispatch('boardStore/getBoardList', 1);
     }
   },
+
   computed: {
     ...mapState('boardStore', ['boards']),
   },

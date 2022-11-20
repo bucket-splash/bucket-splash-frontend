@@ -4,10 +4,29 @@
       <img
         src="https://www.peengler.com/wp-content/uploads/logo-de-peengler.png"
         alt=""
+        style="cursor: pointer"
+        @click="() => this.$router.push('/')"
       />
       <b-nav>
-        <b-nav-item active>Link 1</b-nav-item>
-        <b-nav-item>Link 2</b-nav-item>
+        <b-nav-item @click="() => this.$router.push('/recruit')"
+          >모집중</b-nav-item
+        >
+        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')"
+          >로그인</b-nav-item
+        >
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
+          >우리팀</b-nav-item
+        >
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
+          >팔로우</b-nav-item
+        >
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
+          >내버킷</b-nav-item
+        >
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/login')"
+          >프로필</b-nav-item
+        >
+
         <b-nav-form style="position: relative">
           <b-form-input
             style="padding-right: 2rem; opacity: 0; width: 0"
@@ -28,6 +47,7 @@
 </template>
 <script>
 import gsap from 'gsap';
+import { mapState } from 'vuex';
 export default {
   name: 'Header',
   data() {
@@ -46,6 +66,12 @@ export default {
         color: this.active ? '#fff' : '#000',
       });
     },
+  },
+  computed: {
+    ...mapState('userStore', ['userInfo']),
+  },
+  mounted() {
+    console.log(this.userInfo);
   },
 };
 </script>

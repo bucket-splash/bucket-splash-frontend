@@ -16,8 +16,8 @@ export default {
     Footer,
   },
   created() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    user && this.$store.dispatch('login', user);
+    const token = localStorage.getItem('ssafy-token');
+    token && this.$store.dispatch('userStore/getInfoByToken', token);
   },
 };
 </script>
