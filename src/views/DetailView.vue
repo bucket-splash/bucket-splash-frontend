@@ -110,27 +110,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../style/colors.scss';
-.wrapper {
-  background-color: $blue;
-  min-height: calc(100vh - 8rem);
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
+@import '../style/wrapper.scss';
 
-.inner-wrapper {
-  width: 50%;
-  height: 100%;
-  min-width: 25rem;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: #fff;
-  justify-content: center;
-  gap: 2rem;
-  font-family: 'maple';
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 3px, rgba(0, 0, 0, 0.8) 0px 1px 2px;
-  border-radius: 1rem;
-}
 .profile-container {
   img {
     width: 3rem;

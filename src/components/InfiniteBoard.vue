@@ -66,10 +66,9 @@ export default {
       this.$router.push(`board/${id}`);
     },
   },
-  async created() {
-    if (this.boards.length < 1) {
-      this.$store.dispatch('boardStore/getBoardList', 1);
-    }
+  async mounted() {
+    this.$store.dispatch('boardStore/initBoard');
+    window.scrollTo(0, 0);
   },
 
   computed: {

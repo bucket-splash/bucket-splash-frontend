@@ -4,7 +4,15 @@
       class="container inner-wrapper"
       style="clip-path: circle(0% at 0 0)"
     >
-      <section>
+      <section
+        style="
+          border-bottom: 1px solid $lightGray;
+          display: grid;
+          justify-content: center;
+          grid-template-columns: 80%;
+          gap: 3rem;
+        "
+      >
         <div class="profile">
           <button
             @click="handleLogout"
@@ -112,7 +120,7 @@
         <label
           for="picture"
           style="font-family: maple; font-size: 1.2rem; margin-top: 1rem"
-          >이미지 수정 <b-icon @click="toggleEdit" icon="pencil-square"></b-icon
+          >이미지 수정 <b-icon icon="pencil-square"></b-icon
         ></label>
         <b-form-file
           id="picture"
@@ -324,12 +332,8 @@ export default {
     border-bottom: 1px solid $lightGray;
     display: grid;
     justify-content: center;
-
     grid-template-columns: 80%;
     gap: 3rem;
-    @media screen and (max-width: 1000px) {
-      grid-template-columns: 100%;
-    }
   }
 }
 

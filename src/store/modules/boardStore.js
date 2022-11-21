@@ -22,6 +22,14 @@ const boardStore = {
         return false;
       }
     },
+    initBoard: async ({ state }) => {
+      const { data } = await axios({
+        method: 'GET',
+        url: 'http://localhost:8080/items.json',
+        params: { page: 1 },
+      });
+      state.boards = data.buckets;
+    },
     getBoardDetail: async ({ state }, id) => {
       const { data } = await axios({
         method: 'GET',
