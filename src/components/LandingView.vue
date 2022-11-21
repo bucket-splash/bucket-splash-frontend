@@ -34,8 +34,8 @@ export default {
       },
       {
         ease: 'Power1.easeIn',
-        delay: 0.5,
-        duration: 1,
+        delay: 0.2,
+        duration: 0.8,
         y: '-90vh',
       }
     );
@@ -46,24 +46,24 @@ export default {
       },
       {
         ease: 'Power1.easeIn',
-        delay: 0.7,
-        duration: 1,
+        delay: 0.4,
+        duration: 0.8,
         y: '0vh',
       }
     );
     gsap.to('.bg-img', {
-      delay: 1.7,
-      duration: 1.2,
+      delay: 1.1,
+      duration: 0.8,
       clipPath: 'circle(100%)',
       ease: 'Power1.easeOut',
     });
     gsap.to('.title-container', {
-      delay: 1.7,
-      duration: 1.2,
+      delay: 1.1,
+      duration: 0.8,
       clipPath: 'circle(435px)',
     });
     gsap.from('.b-iconstack', {
-      delay: 2.9,
+      delay: 1.5,
       duration: 0.4,
       opacity: 0,
     });
