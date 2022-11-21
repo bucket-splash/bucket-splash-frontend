@@ -9,15 +9,30 @@
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
 import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 export default {
   name: 'App',
   components: {
     Header,
     Footer,
   },
-  created() {
-    const { email } = jwtDecode(localStorage.getItem('ssafy-token'));
-    console.log(email);
+  async created() {
+    this.$router.push('/');
+    const accessToken = localStorage.getItem('ssafy-token');
+    const { email } = jwtDecode(accessToken);
+    const { data } = await axios({
+      url: `http://172.20.10.8:8080/user/info/${email}`,
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        accessToken,
+      },
+    });
+    console.log(data);
+    if (data.message === 'fail') return;
+    this.$store.dispatch('userStore/login', {
+      userInfo: data.userInfo,
+      token: accessToken,
+    });
   },
 };
 </script>

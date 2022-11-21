@@ -6,8 +6,11 @@
     >
       <section>
         <div class="profile">
-          <img :src="userInfo.img" alt="" />
-          <h3>박코롱 <button>팔로우</button></h3>
+          <img :src="userInfo.profile_image" alt="" style="object-fit: cover" />
+          <h3 style="display: flex; align-items: center; gap: 0.3rem">
+            {{ userInfo.nickname }}
+            <b-icon @click="toggleEdit" icon="pencil-square"></b-icon>
+          </h3>
           <div class="profile-meta">
             <div>
               <h5>팔로잉</h5>
@@ -23,13 +26,12 @@
             </div>
           </div>
           <p>
-            안뇽하세용 ^0^ SSAFY에서 개발자를 준비듕인 박코롱 입니다 ~~~ 코코랑
-            행복 라이프를 업로드 중이에요
+            {{ userInfo.bio ? userInfo.bio : '자기소개가 없습니다' }}
           </p>
         </div>
         <div>
           <h2>내 버킷리스트</h2>
-          <div>
+          <div class="bucket-container">
             <div class="inputGroup">
               <input id="option1" name="option1" type="checkbox" />
               <label for="option1">Option One</label>
@@ -57,24 +59,124 @@
             </div>
           </div>
           <h2>함께 만든 버킷리스트</h2>
-          <div>
-            <div>13반의 버킷리스트</div>
-            <div>코코와의 버킷리스트</div>
+          <div class="team-container">
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span> 13반의 버킷리스트 </span>
+            </div>
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span>코코와의 버킷리스트 </span>
+            </div>
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span> 13반의 버킷리스트 </span>
+            </div>
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span> 13반의 버킷리스트 </span>
+            </div>
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span> 13반의 버킷리스트 </span>
+            </div>
+            <div class="team-card">
+              <img :src="defaultTeamBg" alt="" />
+              <span> 13반의 버킷리스트 </span>
+            </div>
           </div>
         </div>
       </section>
       <section>게시글들이 올거임</section>
     </section>
+
+    <modal name="editModal" height="80%">
+      <div class="my-modal-content p-4">
+        <img
+          :src="profilePreview ? profilePreview : userInfo.profile_image"
+          alt=""
+        />
+        <label
+          for="picture"
+          style="font-family: maple; font-size: 1.2rem; margin-top: 1rem"
+          >이미지 수정 <b-icon @click="toggleEdit" icon="pencil-square"></b-icon
+        ></label>
+        <b-form-file
+          id="picture"
+          ref="imageRef"
+          style="display: none"
+          @change="changePreview"
+          v-model="editForm.uploadImg"
+          :state="Boolean(editForm.uploadImg)"
+          placeholder="프로필이미지 수정"
+          drop-placeholder="Drop file here..."
+        ></b-form-file>
+        <div style="margin: 0" class="form__group field mb-4">
+          <input
+            type="text"
+            class="form__field"
+            :placeholder="userInfo.nickname"
+            name="editNickname"
+            id="editNickname"
+            v-model="editForm.nickname"
+            required
+          />
+          <label for="editNickname" class="form__label">{{
+            userInfo.nickname
+          }}</label>
+        </div>
+        <b-form-textarea
+          style="width: 80%"
+          v-model="editForm.bio"
+          id="textarea-auto-height"
+          rows="3"
+          max-rows="8"
+        ></b-form-textarea>
+        <button
+          @click="handleSubmit"
+          class="button-26 my-4"
+          :disabled="isLoading || !validForm"
+          role="button"
+        >
+          수정하기
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex';
 import gsap from 'gsap';
+import axios from 'axios';
+
 export default {
   name: 'ProfileView',
   computed: {
     ...mapState('userStore', ['userInfo']),
+    validForm() {
+      if (this.editForm.nickname.length <= 0) {
+        return false;
+      } else {
+        return true;
+      }
+    },
   },
+
+  data() {
+    return {
+      modalOpen: false,
+      defaultAvatar: '',
+      profilePreview: '',
+      defaultTeamBg: require('@/assets/images/teamBgDefault.jpg'),
+      isLoading: false,
+      editForm: {
+        nickname: '',
+        bio: '',
+        uploadImg: '',
+      },
+    };
+  },
+
   mounted() {
     gsap.to('.container', {
       delay: 0.1,
@@ -82,11 +184,97 @@ export default {
       clipPath: 'circle(150% at 0 0)',
       ease: 'Power1.easeOut',
     });
+    this.editForm.bio = this.userInfo.bio;
+    this.editForm.nickname = this.userInfo.nickname;
+  },
+  methods: {
+    toggleEdit() {
+      this.$modal.show('editModal');
+    },
+    async changePreview(e) {
+      await this.$nextTick();
+      this.profilePreview = URL.createObjectURL(this.editForm.uploadImg);
+      console.log(this.profilePreview.length);
+    },
+    async handleSubmit() {
+      this.isLoading = true;
+      let imgUrl = this.userInfo.profile_image;
+      if (this.profilePreview.length > 0) {
+        const form = new FormData();
+        form.append('file', this.editForm.uploadImg);
+        form.append('upload_preset', 'quzqjwbp');
+        const { data } = await axios.post(
+          'https://api.cloudinary.com/v1_1/dohkkln9r/upload',
+          form
+        );
+        imgUrl = data.url;
+      }
+
+      await axios({
+        method: 'PUT',
+        url: 'http://172.20.10.8:8080/user/update',
+        data: {
+          bio: this.editForm.bio,
+          nickname: this.editForm.nickname,
+          profile_image: imgUrl,
+          user_id: this.userInfo.user_id,
+        },
+      });
+      this.isLoading = false;
+      this.$modal.hide('editModal');
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 @import '../style/colors.scss';
+@import '../style/input.scss';
+@import '../style/button.scss';
+.bucket-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 2rem;
+}
+.my-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  img {
+    width: 10rem;
+    height: 10rem;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}
+.team-container {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: scroll;
+}
+.team-card {
+  background-color: #3c454c;
+  width: 8rem;
+  height: 8rem;
+  aspect-ratio: 1;
+  position: relative;
+  img {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    position: absolute;
+  }
+  span {
+    width: 100%;
+    z-index: 99;
+    color: white;
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    display: flex;
+    justify-content: center;
+  }
+}
 .wrapper {
   background-color: $blue;
   min-height: calc(100vh - 8rem);
@@ -101,6 +289,7 @@ export default {
   min-width: 25rem;
   margin: 0 auto;
   padding: 2rem;
+  max-width: 550px;
   background-color: #fff;
   justify-content: center;
   gap: 2rem;
@@ -111,7 +300,8 @@ export default {
     border-bottom: 1px solid $lightGray;
     display: grid;
     justify-content: center;
-    grid-template-columns: 45% 45%;
+
+    grid-template-columns: 80%;
     gap: 3rem;
     @media screen and (max-width: 1000px) {
       grid-template-columns: 100%;

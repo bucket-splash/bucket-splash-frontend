@@ -27,7 +27,14 @@
           >내버킷</b-nav-item
         >
         <b-nav-item v-if="userInfo" @click="() => this.$router.push('/profile')"
-          ><img :src="userInfo.img" style="height: 2rem; border-radius: 50%"
+          ><img
+            :src="userInfo.profile_image"
+            style="
+              height: 2rem;
+              width: 2rem;
+              border-radius: 50%;
+              object-fit: cover;
+            "
         /></b-nav-item>
 
         <b-nav-form style="position: relative">

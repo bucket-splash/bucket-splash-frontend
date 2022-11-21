@@ -9,12 +9,14 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import VModal from 'vue-js-modal';
 
 gsap.registerPlugin(ScrollTrigger);
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.use(VueToast);
+Vue.use(VModal);
 
 new Vue({
   router,

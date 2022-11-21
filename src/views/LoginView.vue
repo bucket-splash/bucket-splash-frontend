@@ -86,7 +86,7 @@ export default {
       e.preventDefault();
       this.isLoading = true;
       const { data } = await axios({
-        url: 'http://192.168.35.100:8080/user/login',
+        url: 'http://172.20.10.8:8080/user/login',
         method: 'POST',
         data: {
           email: this.email,
@@ -94,7 +94,10 @@ export default {
         },
       });
       if (data.message === 'fail') {
-        alert('유저정보를 확인해주세요');
+        this.$toast.open({
+          message: '이메일 혹은 비밀번호가 옳바르지 않습니다',
+          type: 'error',
+        });
       } else {
         this.$store.dispatch('userStore/login', {
           token: data.accessToken,
@@ -121,7 +124,7 @@ export default {
                 userInfo: {
                   email: res.id,
                   nickname: res.properties.nickname,
-                  img: res.properties.profile_image,
+                  profile_image: res.properties.profile_image,
                 },
               });
               this.$router.push('/');
@@ -136,6 +139,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../style/colors.scss';
+@import '../style/input.scss';
+@import '../style/button.scss';
 .divider {
   height: 1px;
   background: $lightGray;
@@ -168,100 +173,4 @@ $primary: #11998e;
 $secondary: #38ef7d;
 $white: #fff;
 $gray: #9b9b9b;
-.form__group {
-  position: relative;
-  padding: 15px 0 0;
-  margin-top: 10px;
-  width: 80%;
-}
-
-.form__field {
-  font-family: inherit;
-  width: 100%;
-  border: 0;
-  border-bottom: 2px solid $gray;
-  outline: 0;
-  font-size: 1.3rem;
-  padding: 7px 0;
-  background: transparent;
-  transition: border-color 0.2s;
-
-  &::placeholder {
-    color: transparent;
-  }
-
-  &:placeholder-shown ~ .form__label {
-    font-size: 1.3rem;
-    cursor: text;
-    top: 20px;
-  }
-}
-
-.form__label {
-  position: absolute;
-  top: 0;
-  display: block;
-  transition: 0.2s;
-  font-size: 1rem;
-  color: $gray;
-}
-
-.form__field:focus {
-  ~ .form__label {
-    position: absolute;
-    top: 0;
-    display: block;
-    transition: 0.2s;
-    font-size: 1rem;
-    color: $primary;
-    font-weight: 700;
-  }
-  padding-bottom: 6px;
-  font-weight: 700;
-  border-width: 3px;
-  border-image: linear-gradient(to right, $primary, $secondary);
-  border-image-slice: 1;
-}
-/* reset input */
-.form__field {
-  &:required,
-  &:invalid {
-    box-shadow: none;
-  }
-}
-.button-26 {
-  width: 80%;
-  appearance: button;
-  background-color: #1899d6;
-  border: none;
-  /* background-color: #1899d6; */
-  /* background-color: #1cb0f6; */
-  border-radius: 4px;
-  box-sizing: border-box;
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 1rem;
-  line-height: 1.15;
-  overflow: visible;
-  padding: 12px 16px;
-  position: relative;
-  text-align: center;
-  text-transform: none;
-  transition: all 80ms ease-in-out;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-.button-26:disabled {
-  opacity: 0.5;
-}
-
-.button-26:focus {
-  outline: 0;
-}
-
-.button-26:hover {
-  filter: brightness(1.1);
-}
 </style>

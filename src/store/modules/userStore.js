@@ -6,6 +6,16 @@
  * 토큰은 다시 접속 했을때 자동 로그인 시키기 위해서만 존재
  */
 
+/*
+    bio
+    email
+    nickname
+    password
+    profile_image
+    teamlist_id
+    user_id
+*/
+
 import axios from 'axios';
 
 const userStore = {
