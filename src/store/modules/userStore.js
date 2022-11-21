@@ -32,17 +32,8 @@ const userStore = {
       localStorage.removeItem('ssafy-token');
       state.userInfo = null;
     },
-    async getInfoByToken({ state, dispatch }, token) {
-      const { data } = await axios({
-        url: 'http://localhost:8080/loginSucess.json',
-        method: 'GET',
-        params: { token },
-      });
-      if (data) {
-        state.userInfo = data.userInfo;
-        return;
-      }
-      dispatch('logout');
+    edit({ state }, data) {
+      state.userInfo = data;
     },
   },
 };

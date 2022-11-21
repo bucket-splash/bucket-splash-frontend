@@ -6,6 +6,19 @@
     >
       <section>
         <div class="profile">
+          <button
+            @click="handleLogout"
+            class="button-26"
+            style="
+              position: absolute;
+              right: 1rem;
+              top: 1rem;
+              width: 6rem;
+              background-color: tomato;
+            "
+          >
+            logout
+          </button>
           <img :src="userInfo.profile_image" alt="" style="object-fit: cover" />
           <h3 style="display: flex; align-items: center; gap: 0.3rem">
             {{ userInfo.nickname }}
@@ -191,6 +204,13 @@ export default {
     toggleEdit() {
       this.$modal.show('editModal');
     },
+    handleLogout() {
+      axios({
+        url: `${this.$store.state.baseUrl}user/logout/${this.userInfo.email}`,
+      });
+      this.$store.dispatch('userStore/logout');
+      this.$router.push('/');
+    },
     async changePreview(e) {
       await this.$nextTick();
       this.profilePreview = URL.createObjectURL(this.editForm.uploadImg);
@@ -209,16 +229,20 @@ export default {
         );
         imgUrl = data.url;
       }
-
+      const newData = {
+        bio: this.editForm.bio,
+        nickname: this.editForm.nickname,
+        profile_image: imgUrl,
+        user_id: this.userInfo.user_id,
+      };
       await axios({
         method: 'PUT',
-        url: 'http://172.20.10.8:8080/user/update',
-        data: {
-          bio: this.editForm.bio,
-          nickname: this.editForm.nickname,
-          profile_image: imgUrl,
-          user_id: this.userInfo.user_id,
-        },
+        url: this.$store.state.baseUrl + 'user/update',
+        data: newData,
+      });
+      this.$store.dispatch('userStore/edit', {
+        ...this.userInfo,
+        ...newData,
       });
       this.isLoading = false;
       this.$modal.hide('editModal');

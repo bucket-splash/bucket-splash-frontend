@@ -5,6 +5,7 @@ import DetailView from '../views/DetailView.vue';
 import LoginView from '../views/LoginView.vue';
 import SignupView from '../views/SignupView.vue';
 import ProfileView from '../views/ProfileView.vue';
+import RegistView from '../views/RegistView.vue';
 
 Vue.use(VueRouter);
 
@@ -33,6 +34,11 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: ProfileView,
+  },
+  {
+    path: '/regist',
+    name: 'regist',
+    component: RegistView,
   },
 ];
 

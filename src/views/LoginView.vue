@@ -86,7 +86,7 @@ export default {
       e.preventDefault();
       this.isLoading = true;
       const { data } = await axios({
-        url: 'http://172.20.10.8:8080/user/login',
+        url: this.$store.state.baseUrl + 'user/login',
         method: 'POST',
         data: {
           email: this.email,
@@ -108,31 +108,41 @@ export default {
       this.isLoading = false;
     },
     async kakaoLogin() {
+      this.isLoading = true;
       window.Kakao.Auth.login({
         success: async () => {
           window.Kakao.API.request({
             url: '/v2/user/me',
             success: async (res) => {
               // todo 카카오 로그인 api
-              // const { data } = await axios({});
-              // this.$store.dispatch('login', {
-              //   data: { token: data.accessToken },
-              //   userInfo: data.userInfo,
-              // });
-              this.$store.dispatch('userStore/login', {
-                token: 'kakao-token',
-                userInfo: {
+              const { data } = await axios({
+                url: this.$store.state.baseUrl + 'user/kakao/login',
+                method: 'POST',
+                data: {
                   email: res.id,
                   nickname: res.properties.nickname,
+                  password: res.id,
                   profile_image: res.properties.profile_image,
                 },
               });
+              if (data.message === 'fail') {
+                this.$toast.open({
+                  message: 'unknown error',
+                  type: 'error',
+                });
+                return;
+              }
+              this.$store.dispatch('userStore/login', {
+                token: data.accessToken,
+                userInfo: data.userInfo,
+              });
               this.$router.push('/');
-              return res;
+              return;
             },
           });
         },
       });
+      this.isLoading = false;
     },
   },
 };

@@ -7,12 +7,15 @@ import userStore from '@/store/modules/userStore';
 import todoStore from '@/store/modules/todoStore';
 
 Vue.use(Vuex);
-
+// 192.168.35.122
 export default new Vuex.Store({
   modules: {
     boardStore,
     userStore,
     todoStore,
+  },
+  state: {
+    baseUrl: 'http://192.168.35.122:8080/',
   },
   plugins: [
     createPersistedState({

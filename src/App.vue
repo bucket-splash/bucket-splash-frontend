@@ -21,7 +21,7 @@ export default {
     const accessToken = localStorage.getItem('ssafy-token');
     const { email } = jwtDecode(accessToken);
     const { data } = await axios({
-      url: `http://172.20.10.8:8080/user/info/${email}`,
+      url: `${this.$store.state.baseUrl}user/info/${email}`,
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
         accessToken,
@@ -40,6 +40,11 @@ export default {
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  -ms-overflow-style: none; /* 인터넷 익스플로러 */
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar {
+  display: none; /* 크롬, 사파리, 오페라, 엣지 */
 }
 @font-face {
   font-family: 'maple';

@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     async infiniteHandler($state) {
-      console.log($state);
       const result = await this.$store.dispatch('boardStore/getBoardList', 1);
       if (result) {
         $state.loaded();
