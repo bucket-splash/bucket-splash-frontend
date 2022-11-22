@@ -3,38 +3,31 @@
     <div class="wrapper">
       <div class="item-container" ref="buckets">
         <div class="bucket-container" v-for="(item, i) in boards" :key="i">
-          <div @click="() => handleClick(i)">
-            <img :src="item.bucket.imageUrl" class="thumbnail" />
+          <div @click="() => handleClick(item.board_id)">
+            <img :src="item.board_image ? item.board_image : defaultImg" class="thumbnail" />
             <div class="bucket-content">
-              <h1>{{ item.bucket.title }}</h1>
-              <p class="bucket-text">{{ item.bucket.content }}</p>
-              <p class="bucket-time">
-                {{ item.bucket.createdAt }} · {{ item.bucket.commentCnt }}개의
-                댓글
-              </p>
+              <h1>{{ item.board_title }}</h1>
+              <p class="bucket-text">{{ item.board_content }}</p>
+              <p class="bucket-time">{{ item.created_at }} · {{ 12 }}개의 댓글</p>
             </div>
           </div>
           <div class="divider"></div>
           <div class="bucket-footer">
-            <div>
-              <img :src="item.user.avatarUrl" alt="" class="avatar-img" />
+            <div @click="() => seeProfile(item)">
+              <img :src="item.profile_image" alt="" class="avatar-img" />
               <span style="color: #868e96">by </span>
-              <span>{{ item.user.name }}</span>
+              <span>{{ item.nickname }}</span>
             </div>
             <div>
               <b-icon icon="heart-fill" aria-hidden="true"></b-icon>
-              {{ item.bucket.likeCnt }}
+              {{ 13 }}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div style="height: 10rem"></div>
-    <InfiniteLoading
-      v-if="!isLoading"
-      @infinite="infiniteHandler"
-      spinner="waveDots"
-    ></InfiniteLoading>
+    <div class="empty"></div>
+    <InfiniteLoading v-if="!isLoading" @infinite="infiniteHandler" spinner="waveDots"></InfiniteLoading>
   </div>
 </template>
 <script>
@@ -50,20 +43,31 @@ export default {
       buckets: [],
       isLoading: false,
       limit: 12,
+      page: 2,
+      defaultImg: require('../assets/images/noImg.jpg'),
     };
   },
   methods: {
     async infiniteHandler($state) {
-      const result = await this.$store.dispatch('boardStore/getBoardList', 1);
+      const result = await this.$store.dispatch('boardStore/getBoardList', this.page);
       if (result) {
         $state.loaded();
+        this.page += 1;
         return;
       }
       $state.complete();
+      console.log('보드끗');
       this.isLoading = true;
     },
     handleClick(id) {
       this.$router.push(`board/${id}`);
+    },
+    seeProfile(item) {
+      if (item.email === this.$store.state.userStore.userInfo.email) {
+        this.$router.push(`/profile`);
+        return;
+      }
+      this.$router.push(`/profile/${item.email}`);
     },
   },
   async mounted() {
@@ -88,13 +92,11 @@ export default {
         y: 40,
         ease: 'power1.inOut',
         duration: (index) => {
-          const delay =
-            index / this.limit - (newValue.length - this.limit) / this.limit;
+          const delay = index / this.limit - (newValue.length - this.limit) / this.limit;
           return delay >= 0 ? 0.6 : 0;
         },
         stagger: (index) => {
-          const delay =
-            index / this.limit - (newValue.length - this.limit) / this.limit;
+          const delay = index / this.limit - (newValue.length - this.limit) / this.limit;
           return delay >= 0 ? delay : 0;
         },
         onStart: () => (this.isLoading = true),
@@ -109,6 +111,10 @@ export default {
 
 <style lang="scss" scoped>
 @import '../style/colors.scss';
+.empty {
+  height: 10rem;
+  background-color: $blue;
+}
 .bucket-time {
   font-size: 0.8rem;
   color: $gray;
@@ -116,7 +122,7 @@ export default {
 }
 .bucket-text {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -150,8 +156,10 @@ export default {
 }
 .thumbnail {
   width: 100%;
+  aspect-ratio: 16/9;
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
+  object-fit: cover;
 }
 
 .divider {

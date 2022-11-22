@@ -199,6 +199,7 @@ export default {
   },
 
   mounted() {
+    window.scrollTo(0, 0);
     gsap.to('.container', {
       delay: 0.1,
       duration: 1.6,

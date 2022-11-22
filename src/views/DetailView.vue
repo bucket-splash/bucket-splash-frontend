@@ -2,48 +2,50 @@
   <div class="wrapper py-5">
     <section class="container">
       <div class="inner-wrapper">
-        <div class="profile-container">
-          <img :src="boardDetail.user.avatarUrl" alt="" />
+        <div @click="seeProfile" class="profile-container">
+          <img :src="boardDetail.profile_image" alt="" />
           <div class="profile-item">
             <div>
-              <h4>박이롱</h4>
+              <h4>{{ boardDetail.nickname }}</h4>
               <button>팔로우</button>
             </div>
-            <h6>11월 17일 작성</h6>
+            <h6>{{ boardDetail.created_at }}</h6>
           </div>
         </div>
 
         <!-- 캐러셀 -->
-        <b-carousel
+        <!-- <b-carousel
           id="carousel-1"
           v-model="slide"
-          controls
-          indicators
+          :indicators="false"
           :interval="0"
           background="#ababab"
           img-width="1024"
           img-height="480"
           style="margin-bottom: 1rem"
         >
-          <b-carousel-slide
-            v-for="(item, index) in boardDetail.board.images"
-            :key="index"
-          >
+          <b-carousel-slide>
             <template #img>
               <img
                 class="d-block img-fluid w-100 my-img"
                 width="1024"
                 height="480"
-                :src="item"
+                :src="boardDetail.board_image ? boardDetail.board_image : noImg"
                 alt="image slot"
                 style="height: 15rem"
               />
             </template>
           </b-carousel-slide>
-        </b-carousel>
+        </b-carousel> -->
+
+        <img
+          class="img-fluid w-100 mb-4"
+          :src="boardDetail.board_image ? boardDetail.board_image : noImg"
+          alt="image slot"
+        />
         <!-- 캐러셀 끗  -->
-        <h2>{{ boardDetail.board.title }}</h2>
-        <p>{{ boardDetail.board.content }}</p>
+        <h2>{{ boardDetail.board_title }}</h2>
+        <p>{{ boardDetail.board_content }}</p>
         <div style="display: flex; gap: 0.7rem">
           <span>
             <b-icon color="red" icon="heart-fill" aria-hidden="true"></b-icon>
@@ -53,24 +55,13 @@
           </span>
           <span><b-icon icon="share-fill" aria-hidden="true"></b-icon></span>
         </div>
-        <p style="font-size: 0.8rem">
-          좋아요 {{ boardDetail.board.likeCnt }}개
-        </p>
+        <p style="font-size: 0.8rem">좋아요 {{ 13 }}개</p>
         <!-- 여기부터 댓글창 -->
         <div class="divider"></div>
-
-        <div
-          v-for="(comment, index) in boardDetail.comments"
-          :key="index"
-          class="card p-3 mt-3"
-        >
+        <div v-for="(comment, index) in comments" :key="index" class="card p-3 mt-3">
           <div class="d-flex justify-content-between align-items-center">
             <div class="user d-flex flex-row align-items-center">
-              <img
-                :src="comment.user.avatarUrl"
-                width="30"
-                class="user-img rounded-circle mr-2"
-              />
+              <img :src="comment.avatarUrl" width="30" class="user-img rounded-circle mr-2" />
               <span
                 ><small class="font-weight-bold">{{ comment.user.name }}</small>
               </span>
@@ -79,9 +70,7 @@
             <small>이틀 전</small>
           </div>
 
-          <div
-            class="action d-flex justify-content-between mt-2 align-items-center"
-          >
+          <div class="action d-flex justify-content-between mt-2 align-items-center">
             <div class="reply px-4">{{ comment.payload }}</div>
           </div>
         </div>
@@ -90,20 +79,41 @@
   </div>
 </template>
 <script>
-import { mapState, mapActions } from 'vuex';
+import axios from 'axios';
 
 export default {
   async created() {
-    await this.getBoardDetail();
+    const { data } = await axios({
+      method: 'GET',
+      url: `${this.$store.state.baseUrl}board/${this.$route.params.id}`,
+    });
+    console.log(data);
+    this.boardDetail = data;
+    console.log(this.boardDetail);
   },
-  computed: {
-    ...mapState('boardStore', ['boardDetail']),
+  data() {
+    return {
+      boardDetail: {
+        profile_image: '',
+        board_title: '',
+        nickname: '',
+        board_content: '',
+        email: '',
+        created_at: '',
+      },
+      comments: [],
+      noImg: require('../assets/images/noImg.jpg'),
+    };
   },
   methods: {
-    ...mapActions('boardStore', ['getBoardDetail']),
-    focusImg(e) {
-      e.target.style = '';
-      e.target.parentElement.style.height = '100%';
+    seeProfile() {
+      console.log(this.boardDetail.email);
+      console.log(this.$store.state.userStore.userInfo.email);
+      if (this.boardDetail.email === this.$store.state.userStore.userInfo.email) {
+        this.$router.push(`/profile`);
+        return;
+      }
+      this.$router.push(`/profile/${this.boardDetail.email}`);
     },
   },
 };

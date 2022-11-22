@@ -5,6 +5,7 @@ import DetailView from '../views/DetailView.vue';
 import LoginView from '../views/LoginView.vue';
 import SignupView from '../views/SignupView.vue';
 import ProfileView from '../views/ProfileView.vue';
+import UserProfileView from '../views/UserProfileView.vue';
 import RegistView from '../views/RegistView.vue';
 
 Vue.use(VueRouter);
@@ -34,6 +35,11 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: ProfileView,
+  },
+  {
+    path: '/profile/:email',
+    name: 'UserProfileView',
+    component: UserProfileView,
   },
   {
     path: '/regist',

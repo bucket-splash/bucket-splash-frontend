@@ -9,16 +9,31 @@
           align-items: center;
         "
       >
-        <img
-          :src="previewImg ? previewImg : noImg"
-          style="width: 100%; object-fit: cover"
-        />
+        <label for="picture" style="cursor: pointer">
+          <img
+            :src="previewImg ? previewImg : noImg"
+            style="width: 100%; object-fit: cover"
+          />
+        </label>
         <label
           for="picture"
-          style="font-family: maple; font-size: 1.2rem; margin-top: 1rem"
+          style="
+            cursor: pointer;
+            font-family: maple;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+          "
         >
           이미지 업로드 <b-icon icon="pencil-square"></b-icon>
         </label>
+
+        <input
+          class="image-input d-block w-100"
+          v-model="uploadImgUrl"
+          @change="changePreviewByUrl"
+          type="input"
+          placeholder="또는 이미지URL"
+        />
 
         <b-form-file
           id="picture"
@@ -45,6 +60,7 @@
           id="textarea-auto-height"
           rows="3"
           max-rows="8"
+          required
         ></b-form-textarea>
         <button @click="handleSubmit" class="button-26 my-4" role="button">
           등록
@@ -66,17 +82,30 @@ export default {
       uploadImg: '',
       content: '',
       isLoading: false,
+      uploadImgUrl: '',
     };
   },
   methods: {
+    changePreviewByUrl() {
+      this.previewImg = this.uploadImgUrl;
+      this.uploadImg = '';
+    },
     async changePreview() {
       await this.$nextTick();
+      if (this.uploadImg.size > 2097152) {
+        this.$toast.open({
+          message: '파일의 크기가 너무 큽니다 (2MB이상)',
+          type: 'error',
+        });
+        return;
+      }
+      this.uploadImgUrl = '';
       this.previewImg = URL.createObjectURL(this.uploadImg);
     },
     async handleSubmit() {
       this.isLoading = true;
-      let imgUrl = null;
-      if (this.previewImg.length > 0) {
+
+      if (this.uploadImg) {
         const form = new FormData();
         form.append('file', this.uploadImg);
         form.append('upload_preset', 'quzqjwbp');
@@ -84,13 +113,13 @@ export default {
           'https://api.cloudinary.com/v1_1/dohkkln9r/upload',
           form
         );
-        imgUrl = data.url;
+        this.uploadImgUrl = data.url;
       }
       const boardData = {
         board_content: this.content,
         board_title: this.title,
         created_by: this.$store.state.userStore.userInfo.email,
-        board_image: imgUrl,
+        board_image: this.uploadImgUrl,
       };
       axios({
         method: 'POST',
@@ -109,4 +138,11 @@ export default {
 @import '../style/colors.scss';
 @import '../style/input.scss';
 @import '../style/button.scss';
+.image-input {
+  border: none;
+  background: $lightGray;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  outline: none;
+}
 </style>

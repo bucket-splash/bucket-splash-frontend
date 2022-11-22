@@ -10,25 +10,21 @@ const boardStore = {
     getBoardList: async ({ state }, page) => {
       const { data } = await axios({
         method: 'GET',
-        url: 'http://localhost:8080/items.json',
+        url: `http://192.168.201.240:8080/board`,
         params: { page },
       });
-      if (state.boards.length > 50) {
-        return false;
-      } else if (data) {
-        state.boards = [...state.boards, ...data.buckets];
-        return true;
-      } else {
-        return false;
-      }
+      console.log(data);
+      if (data.length === 0) return false;
+      state.boards = [...state.boards, ...data];
+      return true;
     },
     initBoard: async ({ state }) => {
       const { data } = await axios({
         method: 'GET',
-        url: 'http://localhost:8080/items.json',
+        url: `http://192.168.201.240:8080/board`,
         params: { page: 1 },
       });
-      state.boards = data.buckets;
+      state.boards = data;
     },
     getBoardDetail: async ({ state }, id) => {
       const { data } = await axios({
