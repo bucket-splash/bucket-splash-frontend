@@ -1,9 +1,6 @@
 <template lang="">
   <div class="wrapper py-5">
-    <section
-      class="container inner-wrapper"
-      style="clip-path: circle(0% at 0 0)"
-    >
+    <section class="container inner-wrapper" style="clip-path: circle(0% at 0 0)">
       <section
         style="
           border-bottom: 1px solid $lightGray;
@@ -17,17 +14,15 @@
           <button
             @click="handleLogout"
             class="button-26"
-            style="
-              position: absolute;
-              right: 1rem;
-              top: 1rem;
-              width: 6rem;
-              background-color: tomato;
-            "
+            style="position: absolute; right: 1rem; top: 1rem; width: 6rem; background-color: tomato"
           >
             logout
           </button>
-          <img :src="userInfo.profile_image" alt="" style="object-fit: cover" />
+          <img
+            :src="userInfo.profile_image ? userInfo.profile_image : defaultAvatar"
+            alt=""
+            style="object-fit: cover"
+          />
           <h3 style="display: flex; align-items: center; gap: 0.3rem">
             {{ userInfo.nickname }}
             <b-icon @click="toggleEdit" icon="pencil-square"></b-icon>
@@ -79,7 +74,7 @@
               <label for="option6">Option Two</label>
             </div>
           </div>
-          <h2>함께 만든 버킷리스트</h2>
+          <h2>우리 팀</h2>
           <div class="team-container">
             <div class="team-card">
               <img :src="defaultTeamBg" alt="" />
@@ -108,18 +103,13 @@
           </div>
         </div>
       </section>
-      <section>게시글들이 올거임</section>
+      <section>내 게시글</section>
     </section>
 
     <modal name="editModal" height="80%">
       <div class="my-modal-content p-4">
-        <img
-          :src="profilePreview ? profilePreview : userInfo.profile_image"
-          alt=""
-        />
-        <label
-          for="picture"
-          style="font-family: maple; font-size: 1.2rem; margin-top: 1rem"
+        <img :src="profilePreview ? profilePreview : userInfo.profile_image" alt="" />
+        <label for="picture" style="font-family: maple; font-size: 1.2rem; margin-top: 1rem"
           >이미지 수정 <b-icon icon="pencil-square"></b-icon
         ></label>
         <b-form-file
@@ -142,9 +132,7 @@
             v-model="editForm.nickname"
             required
           />
-          <label for="editNickname" class="form__label">{{
-            userInfo.nickname
-          }}</label>
+          <label for="editNickname" class="form__label">{{ userInfo.nickname }}</label>
         </div>
         <b-form-textarea
           style="width: 80%"
@@ -153,12 +141,7 @@
           rows="3"
           max-rows="8"
         ></b-form-textarea>
-        <button
-          @click="handleSubmit"
-          class="button-26 my-4"
-          :disabled="isLoading || !validForm"
-          role="button"
-        >
+        <button @click="handleSubmit" class="button-26 my-4" :disabled="isLoading || !validForm" role="button">
           수정하기
         </button>
       </div>
@@ -186,7 +169,7 @@ export default {
   data() {
     return {
       modalOpen: false,
-      defaultAvatar: '',
+      defaultAvatar: require('@/assets/images/defaultProfile.jpg'),
       profilePreview: '',
       defaultTeamBg: require('@/assets/images/teamBgDefault.jpg'),
       isLoading: false,
@@ -232,10 +215,7 @@ export default {
         const form = new FormData();
         form.append('file', this.editForm.uploadImg);
         form.append('upload_preset', 'quzqjwbp');
-        const { data } = await axios.post(
-          'https://api.cloudinary.com/v1_1/dohkkln9r/upload',
-          form
-        );
+        const { data } = await axios.post('https://api.cloudinary.com/v1_1/dohkkln9r/upload', form);
         imgUrl = data.url;
       }
       const newData = {

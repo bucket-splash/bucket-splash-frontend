@@ -1,29 +1,11 @@
 <template lang="">
   <div class="wrapper py-5">
     <div class="container inner-wrapper">
-      <section
-        style="
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        "
-      >
+      <section style="display: flex; flex-direction: column; justify-content: center; align-items: center">
         <label for="picture" style="cursor: pointer">
-          <img
-            :src="previewImg ? previewImg : noImg"
-            style="width: 100%; object-fit: cover"
-          />
+          <img :src="previewImg ? previewImg : noImg" style="width: 100%; object-fit: cover" />
         </label>
-        <label
-          for="picture"
-          style="
-            cursor: pointer;
-            font-family: maple;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-          "
-        >
+        <label for="picture" style="cursor: pointer; font-family: maple; font-size: 1.2rem; margin-top: 1rem">
           이미지 업로드 <b-icon icon="pencil-square"></b-icon>
         </label>
 
@@ -43,15 +25,7 @@
           :state="Boolean(uploadImg)"
         ></b-form-file>
         <div style="margin: 0" class="form__group field mb-4">
-          <input
-            type="text"
-            class="form__field"
-            placeholder="제목"
-            name="title"
-            id="title"
-            v-model="title"
-            required
-          />
+          <input type="text" class="form__field" placeholder="제목" name="title" id="title" v-model="title" required />
           <label for="title" class="form__label">제목</label>
         </div>
         <b-form-textarea
@@ -62,9 +36,7 @@
           max-rows="8"
           required
         ></b-form-textarea>
-        <button @click="handleSubmit" class="button-26 my-4" role="button">
-          등록
-        </button>
+        <button @click="handleSubmit" class="button-26 my-4" role="button">등록</button>
       </section>
     </div>
   </div>
@@ -76,12 +48,12 @@ export default {
   name: 'RegistView',
   data() {
     return {
-      previewImg: '',
       noImg: require('../assets/images/noImg.jpg'),
       title: '',
-      uploadImg: '',
       content: '',
       isLoading: false,
+      uploadImg: '',
+      previewImg: '',
       uploadImgUrl: '',
     };
   },
@@ -109,10 +81,7 @@ export default {
         const form = new FormData();
         form.append('file', this.uploadImg);
         form.append('upload_preset', 'quzqjwbp');
-        const { data } = await axios.post(
-          'https://api.cloudinary.com/v1_1/dohkkln9r/upload',
-          form
-        );
+        const { data } = await axios.post('https://api.cloudinary.com/v1_1/dohkkln9r/upload', form);
         this.uploadImgUrl = data.url;
       }
       const boardData = {

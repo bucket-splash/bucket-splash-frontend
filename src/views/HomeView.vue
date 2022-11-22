@@ -2,7 +2,7 @@
   <div>
     <LandingView />
     <InfiniteBoard />
-    <FloatButton v-if="userInfo" />
+    <FloatButton />
   </div>
 </template>
 

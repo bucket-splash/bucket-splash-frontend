@@ -2,13 +2,7 @@
   <div class="wrapper py-5">
     <section class="container inner-wrapper" style="clip-path: circle(0% at 0 0)">
       <section
-        style="
-          border-bottom: 1px solid $lightGray;
-          display: grid;
-          justify-content: center;
-          grid-template-columns: 80%;
-          gap: 3rem;
-        "
+        style="display: grid; justify-content: center; grid-template-columns: 80%; gap: 3rem; margin-bottom: 2rem"
       >
         <div class="profile">
           <img
@@ -39,13 +33,14 @@
         </div>
         <div>
           <h2>{{ userInfo.nickname }}의 버킷리스트</h2>
-          <div class="bucket-container">
+          <div v-for="(bucket, index) in buckets" :key="index" class="bucket-container" style="margin-bottom: 0.5rem">
             <div class="inputGroup" style="cursor: default">
-              <input id="option1" name="option1" type="checkbox" checked disabled />
-              <label for="option1">Option One</label>
+              <input id="option1" name="option1" type="checkbox" :checked="bucket.check === 1" disabled />
+              <label for="option1">{{ bucket.bucket_title }}</label>
             </div>
           </div>
-          <h2>{{ userInfo.nickname }}와 함께 만든 버킷리스트</h2>
+          <div v-if="buckets.length === 0">버킷리스트가 없습니다</div>
+          <h2 style="margin-top: 1rem">{{ userInfo.nickname }}의 팀</h2>
           <div class="team-container">
             <div class="team-card">
               <img :src="defaultTeamBg" alt="" />
@@ -55,8 +50,12 @@
         </div>
       </section>
       <section>
-        <div v-for="(board, index) in boards" :key="index">
-          <div>{{ index }}</div>
+        <h1>{{ userInfo.nickname }}의 게시글</h1>
+        <div v-for="(board, index) in boards" :key="index" class="board-container">
+          <img :src="board.board_image ? board.board_image : defaultBoardImg" alt="" />
+          <h1>{{ board.board_title }}</h1>
+          <p>{{ board.board_content }}</p>
+          <span>{{ board.created_at }}</span>
         </div>
       </section>
     </section>
@@ -75,7 +74,8 @@ export default {
       defaultAvatar: '',
       profilePreview: '',
       defaultTeamBg: require('@/assets/images/teamBgDefault.jpg'),
-      defaultProfileImg: require('@/assets/images/noImg.jpg'),
+      defaultProfileImg: require('@/assets/images/defaultProfile.jpg'),
+      defaultBoardImg: require('@/assets/images/noImg.jpg'),
       isLoading: false,
 
       userInfo: {
@@ -101,13 +101,8 @@ export default {
       ease: 'Power1.easeOut',
     });
 
-    const accessToken = localStorage.getItem('ssafy-token');
     const { data } = await axios({
-      url: `${this.$store.state.baseUrl}user/info/${this.$route.params.email}`,
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        accessToken,
-      },
+      url: `${this.$store.state.baseUrl}user/${this.$route.params.email}`,
     });
     this.userInfo = data.userInfo;
     this.boards = data.Boards;
@@ -121,6 +116,13 @@ export default {
 @import '../style/colors.scss';
 @import '../style/input.scss';
 @import '../style/button.scss';
+.board-container {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $lightGray;
+  img {
+    width: 100%;
+  }
+}
 .bucket-container {
   display: flex;
   flex-direction: column;
@@ -141,7 +143,8 @@ export default {
 .team-container {
   display: flex;
   gap: 0.5rem;
-  overflow-x: scroll;
+  /* overflow-x: scroll; */
+  margin-bottom: 1rem;
 }
 .team-card {
   background-color: #3c454c;

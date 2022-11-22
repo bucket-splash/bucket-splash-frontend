@@ -10,7 +10,7 @@ const boardStore = {
     getBoardList: async ({ state }, page) => {
       const { data } = await axios({
         method: 'GET',
-        url: `http://192.168.201.240:8080/board`,
+        url: `http://70.12.50.130:8080/board`,
         params: { page },
       });
       console.log(data);
@@ -21,7 +21,7 @@ const boardStore = {
     initBoard: async ({ state }) => {
       const { data } = await axios({
         method: 'GET',
-        url: `http://192.168.201.240:8080/board`,
+        url: `http://70.12.50.130:8080/board`,
         params: { page: 1 },
       });
       state.boards = data;

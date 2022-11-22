@@ -27,7 +27,7 @@ export default {
         accessToken,
       },
     });
-    console.log(data);
+    console.log('Valid Token:', data);
     if (data.message === 'fail') return;
     this.$store.dispatch('userStore/login', {
       userInfo: data.userInfo,
@@ -37,6 +37,9 @@ export default {
 };
 </script>
 <style lang="scss">
+* {
+  scroll-behavior: smooth;
+}
 body {
   max-width: 100vw;
   overflow-x: hidden;

@@ -3,8 +3,8 @@
     <div class="wrapper">
       <div class="item-container" ref="buckets">
         <div class="bucket-container" v-for="(item, i) in boards" :key="i">
-          <div @click="() => handleClick(item.board_id)">
-            <img :src="item.board_image ? item.board_image : defaultImg" class="thumbnail" />
+          <div style="cursor: pointer" @click="() => handleClick(item.board_id)">
+            <img :src="item.board_image ? item.board_image : noImg" class="thumbnail" />
             <div class="bucket-content">
               <h1>{{ item.board_title }}</h1>
               <p class="bucket-text">{{ item.board_content }}</p>
@@ -12,9 +12,9 @@
             </div>
           </div>
           <div class="divider"></div>
-          <div class="bucket-footer">
+          <div class="bucket-footer" style="cursor: pointer">
             <div @click="() => seeProfile(item)">
-              <img :src="item.profile_image" alt="" class="avatar-img" />
+              <img :src="item.profile_image ? item.profile_image : defaultProfile" alt="" class="avatar-img" />
               <span style="color: #868e96">by </span>
               <span>{{ item.nickname }}</span>
             </div>
@@ -26,7 +26,9 @@
         </div>
       </div>
     </div>
-    <div class="empty"></div>
+    <div class="empty">
+      <span v-if="finish">더 이상 로드할 게시글이 없습니다</span>
+    </div>
     <InfiniteLoading v-if="!isLoading" @infinite="infiniteHandler" spinner="waveDots"></InfiniteLoading>
   </div>
 </template>
@@ -44,7 +46,9 @@ export default {
       isLoading: false,
       limit: 12,
       page: 2,
-      defaultImg: require('../assets/images/noImg.jpg'),
+      defaultProfile: require('../assets/images/defaultProfile.jpg'),
+      noImg: require('../assets/images/noImg.jpg'),
+      finish: false,
     };
   },
   methods: {
@@ -56,14 +60,14 @@ export default {
         return;
       }
       $state.complete();
-      console.log('보드끗');
+      this.finish = true;
       this.isLoading = true;
     },
     handleClick(id) {
       this.$router.push(`board/${id}`);
     },
     seeProfile(item) {
-      if (item.email === this.$store.state.userStore.userInfo.email) {
+      if (item.email === this.$store.state.userStore?.userInfo?.email) {
         this.$router.push(`/profile`);
         return;
       }
@@ -72,7 +76,6 @@ export default {
   },
   async mounted() {
     this.$store.dispatch('boardStore/initBoard');
-    window.scrollTo(0, 0);
   },
 
   computed: {
@@ -114,6 +117,10 @@ export default {
 .empty {
   height: 10rem;
   background-color: $blue;
+  display: flex;
+  justify-content: center;
+  font-family: 'maple';
+  font-size: 1.5rem;
 }
 .bucket-time {
   font-size: 0.8rem;
@@ -147,6 +154,10 @@ export default {
 .bucket-container {
   border-radius: 1rem;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 3px, rgba(0, 0, 0, 0.32) 0px 1px 2px;
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
 }
 .bucket-content {
   padding: 1rem 1rem 0.5rem;

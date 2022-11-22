@@ -8,48 +8,22 @@
         @click="() => this.$router.push('/')"
       />
       <b-nav style="align-items: center">
-        <b-nav-item @click="() => this.$router.push('/recruit')"
-          >모집중</b-nav-item
-        >
-        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')"
-          >로그인</b-nav-item
-        >
-        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/signup')"
-          >회원가입</b-nav-item
-        >
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
-          >우리팀</b-nav-item
-        >
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
-          >팔로우</b-nav-item
-        >
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')"
-          >내버킷</b-nav-item
-        >
+        <b-nav-item @click="() => this.$router.push('/recruit')">모집중</b-nav-item>
+        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')">로그인</b-nav-item>
+        <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/signup')">회원가입</b-nav-item>
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">우리팀</b-nav-item>
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">팔로우</b-nav-item>
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">내버킷</b-nav-item>
         <b-nav-item v-if="userInfo" @click="() => this.$router.push('/profile')"
           ><img
-            :src="userInfo.profile_image"
-            style="
-              height: 2rem;
-              width: 2rem;
-              border-radius: 50%;
-              object-fit: cover;
-            "
+            :src="userInfo.profile_image ? userInfo.profile_image : defaultProfile"
+            style="height: 2rem; width: 2rem; border-radius: 50%; object-fit: cover"
         /></b-nav-item>
 
         <b-nav-form style="position: relative">
-          <b-form-input
-            style="padding-right: 2rem; opacity: 0; width: 0"
-            aria-label="Input"
-            class="header-input"
-          >
+          <b-form-input style="padding-right: 2rem; opacity: 0; width: 0" aria-label="Input" class="header-input">
           </b-form-input>
-          <b-icon
-            @click="handleClick"
-            icon="search"
-            font-scale="1.5rem"
-            class="search-icon"
-          ></b-icon>
+          <b-icon @click="handleClick" icon="search" font-scale="1.5rem" class="search-icon"></b-icon>
         </b-nav-form>
       </b-nav>
     </div>
@@ -63,6 +37,7 @@ export default {
   data() {
     return {
       active: false,
+      defaultProfile: require('../assets/images/defaultProfile.jpg'),
     };
   },
   methods: {
