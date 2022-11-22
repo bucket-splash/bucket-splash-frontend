@@ -65,20 +65,63 @@
         <p style="font-size: 0.8rem">좋아요 {{ 13 }}개</p>
         <!-- 여기부터 댓글창 -->
         <div class="divider"></div>
+        <form style="position: relative" @submit="submitComment">
+          <input
+            type="text"
+            v-model="commentContent"
+            class="my-input"
+            style="width: 100%; padding-right: 4rem; height: 4rem"
+          />
+          <b-button
+            type="submit"
+            variant="outline-primary"
+            style="position: absolute; right: 0; top: 50%; transform: translate(-1rem, -50%)"
+            >작성하기</b-button
+          >
+        </form>
         <div v-for="(comment, index) in comments" :key="index" class="card p-3 mt-3">
           <div class="d-flex justify-content-between align-items-center">
             <div class="user d-flex flex-row align-items-center">
-              <img :src="comment.avatarUrl" width="30" class="user-img rounded-circle mr-2" />
+              <img
+                :src="comment.profile_image ? comment.profile_image : defaultProfile"
+                width="30"
+                class="user-img rounded-circle mr-2"
+                style="aspect-ratio: 1; object-fit: cover"
+              />
               <span
-                ><small class="font-weight-bold">{{ comment.user.name }}</small>
+                ><small class="font-weight-bold">{{ comment.nickname }}</small>
               </span>
             </div>
 
-            <small>이틀 전</small>
+            <small style="display: flex; gap: 0.5rem; align-items: center">
+              {{ comment.created_at }}
+              <span
+                v-if="comment.email === userInfo?.email"
+                @click.stop="() => editComment(comment)"
+                style="cursor: pointer; font-size: 1.2rem"
+                color="green"
+                ><b-icon
+                  :icon="toggleCommentEdit === comment.board_comment_id ? 'check-lg' : 'pencil-square'"
+                  aria-hidden="true"
+                ></b-icon
+              ></span>
+
+              <span
+                v-if="comment.email === userInfo?.email"
+                @click.stop="() => deleteComment(comment)"
+                style="color: tomato; cursor: pointer; font-size: 1.2rem"
+                ><b-icon icon="trash-fill" aria-hidden="true"></b-icon
+              ></span>
+            </small>
           </div>
 
           <div class="action d-flex justify-content-between mt-2 align-items-center">
-            <div class="reply px-4">{{ comment.payload }}</div>
+            <div v-if="toggleCommentEdit !== comment.board_comment_id" class="reply px-4">
+              {{ comment.board_comment_content }}
+            </div>
+            <div v-if="toggleCommentEdit === comment.board_comment_id" class="reply px-4">
+              <input type="text" v-model="commentEdit" />
+            </div>
           </div>
         </div>
       </div>
@@ -103,7 +146,7 @@
           drop-placeholder="Drop file here..."
         ></b-form-file>
         <input
-          class="image-input d-block w-100"
+          class="my-input d-block w-100"
           v-model="uploadImgUrl"
           @change="changePreviewByUrl"
           type="input"
@@ -145,14 +188,27 @@
 </template>
 <script>
 import axios from 'axios';
-
+import { mapState } from 'vuex';
 export default {
+  computed: {
+    ...mapState('userStore', ['userInfo']),
+  },
   async created() {
+    console.log('Created');
     const { data } = await axios({
       method: 'GET',
       url: `${this.$store.state.baseUrl}board/${this.$route.params.id}`,
     });
     this.boardDetail = data;
+    // const commentRes = await axios({
+    //   method: 'GET',
+    //   url: `${this.$store.state.baseUrl}board/comment`,
+    //   params: {
+    //     board_id: data.board_id,
+    //     page: 1,
+    //   },
+    // });
+    // this.comments = commentRes.data;
   },
   data() {
     return {
@@ -165,6 +221,7 @@ export default {
         created_at: '',
         board_image: '',
       },
+      commentContent: '',
       editForm: {
         board_title: '',
         board_content: '',
@@ -172,13 +229,102 @@ export default {
       uploadImg: '',
       previewImg: '',
       uploadImgUrl: '',
-      comments: [],
+      toggleCommentEdit: -1,
+      commentEdit: '',
+      comments: [
+        {
+          profile_image: 'https://vlee.kr/wp-content/uploads/2020/03/%EC%95%84%EC%9D%B4%EC%9C%A0_01_5120-1024x576.jpg',
+          nickname: '롱롱',
+          created_at: '2022-11-22T04:50:51.000+00:00',
+          email: 'dasliebeich7@gmail.com',
+          board_comment_content: '시원한 수박주스~~',
+
+          bio: '백엔드 개발자입니다.',
+          board_comment_id: 3,
+          user_id: 2,
+          created_by: 'dasliebeich7@gmail.com',
+          board_id: 6,
+        },
+        {
+          profile_image: 'http://res.cloudinary.com/dohkkln9r/image/upload/v1669034096/kou4pka7md92garyo2fc.png',
+          board_comment_id: 2,
+          user_id: 1,
+          board_id: 6,
+          nickname: '바로바껴랏',
+          created_at: '2022-11-22T04:50:29.000+00:00',
+          bio: '안녕하세요~~~ 바꼇습니다~~\n프로필 이미지 바꿈~~~',
+          created_by: 'hi6724@gmail.com',
+          email: 'hi6724@gmail.com',
+          board_comment_content: '키야 과일주스 중에선 수박주스가 짱이죠!',
+        },
+        {
+          profile_image: 'https://i.pinimg.com/564x/3e/ca/5b/3eca5b1a9acb1b957d534187737832dd.jpg',
+          board_comment_id: 1,
+          user_id: 4,
+          board_id: 6,
+          nickname: '수지',
+          created_at: '2022-11-22T04:49:45.000+00:00',
+          bio: '수지입니다.',
+          created_by: 'suji@gmail.com',
+          email: 'suji@gmail.com',
+          board_comment_content: '우와 너무 재밌을 것 같아요~',
+        },
+      ],
       isLoading: false,
       noImg: require('../assets/images/noImg.jpg'),
       defaultProfile: require('../assets/images/defaultProfile.jpg'),
     };
   },
   methods: {
+    editComment(item) {
+      if (this.toggleCommentEdit === -1) {
+        this.commentEdit = item.board_comment_content;
+        this.toggleCommentEdit = item.board_comment_id;
+        return;
+      }
+      const newComments = this.comments.map((comment) => {
+        if (comment.board_comment_id !== item.board_comment_id) return comment;
+        return { ...comment, board_comment_content: this.commentEdit };
+      });
+      this.comments = newComments;
+      this.toggleCommentEdit = -1;
+    },
+    deleteComment(item) {
+      // axios({
+      //   method: "DELETE",
+      //   url: `${this.$store.state.baseUrl}board/comment/${this.boardDetail.board_comment_id}`,
+      // })
+      const newComments = this.comments.filter((comment) => comment.board_comment_id !== item.board_comment_id);
+      this.comments = newComments;
+    },
+    submitComment(e) {
+      e.preventDefault();
+      if (this.commentContent.length < 5) {
+        this.$toast.open({
+          message: '댓글을 5글자 이상 입력해주세요',
+          type: 'error',
+        });
+        return;
+      }
+      const newComment = {
+        profile_image: this.userInfo.profile_image,
+        nickname: this.userInfo.nickname,
+        created_at: '2022-11-22T04:50:51.000+00:00',
+        email: this.userInfo.email,
+        board_comment_content: this.commentContent,
+      };
+      this.comments = [newComment, ...this.comments];
+      // axios({
+      //   method: 'POST',
+      //   url: `${this.$store.state.baseUrl}board/comment`,
+      //   data: {
+      //     board_comment_content: this.commentContent,
+      //     board_id: this.boardDetail.board_id,
+      //     created_by: this.userInfo.email,
+      //   },
+      // });
+      this.commentContent = '';
+    },
     handleDelete() {
       axios({
         method: 'DELETE',
@@ -190,7 +336,7 @@ export default {
       this.$modal.show('editModal');
     },
     seeProfile() {
-      if (this.boardDetail.email === this.$store.state.userStore?.userInfo?.email) {
+      if (this.boardDetail.email === this.userInfo?.email) {
         this.$router.push(`/profile`);
         return;
       }
@@ -227,7 +373,7 @@ export default {
         data: {
           board_content: this.editForm.board_content ? this.editForm.board_content : this.boardDetail.board_content,
           board_title: this.editForm.board_title ? this.editForm.board_title : this.boardDetail.board_title,
-          created_by: this.$store.state.userStore.userInfo.email,
+          created_by: this.userInfo.email,
           board_image: this.uploadImgUrl ? this.uploadImgUrl : this.boardDetail.board_image,
           board_id: this.boardDetail.board_id,
         },

@@ -63,3 +63,11 @@ $gray: #9b9b9b;
     box-shadow: none;
   }
 }
+
+.my-input {
+  border: none;
+  background: $lightGray;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  outline: none;
+}
