@@ -17,5 +17,12 @@ export default {
   computed: {
     ...mapState('userStore', ['userInfo']),
   },
+  mounted() {
+    const myEl = document.getElementById('window-top');
+    this.$smoothScroll({
+      scrollTo: myEl,
+      duration: 0.5,
+    });
+  },
 };
 </script>

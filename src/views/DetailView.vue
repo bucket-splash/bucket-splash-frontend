@@ -81,7 +81,11 @@
         </form>
         <div v-for="(comment, index) in comments" :key="index" class="card p-3 mt-3">
           <div class="d-flex justify-content-between align-items-center">
-            <div class="user d-flex flex-row align-items-center">
+            <div
+              @click="() => showProfile(comment)"
+              style="cursor: pointer"
+              class="user d-flex flex-row align-items-center"
+            >
               <img
                 :src="comment.profile_image ? comment.profile_image : defaultProfile"
                 width="30"
@@ -101,10 +105,13 @@
                 style="cursor: pointer; font-size: 1.2rem"
                 color="green"
                 ><b-icon
-                  :icon="toggleCommentEdit === comment.board_comment_id ? 'check-lg' : 'pencil-square'"
+                  color="green"
+                  v-if="toggleCommentEdit === comment.board_comment_id"
+                  icon="check-lg"
                   aria-hidden="true"
-                ></b-icon
-              ></span>
+                ></b-icon>
+                <b-icon v-else icon="pencil-square" aria-hidden="true"></b-icon>
+              </span>
 
               <span
                 v-if="comment.email === userInfo?.email"
@@ -119,8 +126,8 @@
             <div v-if="toggleCommentEdit !== comment.board_comment_id" class="reply px-4">
               {{ comment.board_comment_content }}
             </div>
-            <div v-if="toggleCommentEdit === comment.board_comment_id" class="reply px-4">
-              <input type="text" v-model="commentEdit" />
+            <div v-if="toggleCommentEdit === comment.board_comment_id" class="reply px-4" style="width: 100%">
+              <input class="my-input" type="text" v-model="commentEdit" style="width: 100%" />
             </div>
           </div>
         </div>
@@ -189,26 +196,30 @@
 <script>
 import axios from 'axios';
 import { mapState } from 'vuex';
+import { timeUtil } from '@/utils/timeUtil';
 export default {
   computed: {
     ...mapState('userStore', ['userInfo']),
   },
   async created() {
-    console.log('Created');
     const { data } = await axios({
       method: 'GET',
       url: `${this.$store.state.baseUrl}board/${this.$route.params.id}`,
     });
     this.boardDetail = data;
-    // const commentRes = await axios({
-    //   method: 'GET',
-    //   url: `${this.$store.state.baseUrl}board/comment`,
-    //   params: {
-    //     board_id: data.board_id,
-    //     page: 1,
-    //   },
-    // });
-    // this.comments = commentRes.data;
+    this.boardDetail.created_at = timeUtil(this.boardDetail.created_at);
+    const commentRes = await axios({
+      method: 'GET',
+      url: `${this.$store.state.baseUrl}board/comment/`,
+      params: {
+        board_id: data.board_id,
+        page: 1,
+      },
+    });
+    this.comments = commentRes.data.map((item) => {
+      console.log(item.created_at);
+      return { ...item, created_at: timeUtil(item.created_at) };
+    });
   },
   data() {
     return {
@@ -231,53 +242,20 @@ export default {
       uploadImgUrl: '',
       toggleCommentEdit: -1,
       commentEdit: '',
-      comments: [
-        {
-          profile_image: 'https://vlee.kr/wp-content/uploads/2020/03/%EC%95%84%EC%9D%B4%EC%9C%A0_01_5120-1024x576.jpg',
-          nickname: '롱롱',
-          created_at: '2022-11-22T04:50:51.000+00:00',
-          email: 'dasliebeich7@gmail.com',
-          board_comment_content: '시원한 수박주스~~',
-
-          bio: '백엔드 개발자입니다.',
-          board_comment_id: 3,
-          user_id: 2,
-          created_by: 'dasliebeich7@gmail.com',
-          board_id: 6,
-        },
-        {
-          profile_image: 'http://res.cloudinary.com/dohkkln9r/image/upload/v1669034096/kou4pka7md92garyo2fc.png',
-          board_comment_id: 2,
-          user_id: 1,
-          board_id: 6,
-          nickname: '바로바껴랏',
-          created_at: '2022-11-22T04:50:29.000+00:00',
-          bio: '안녕하세요~~~ 바꼇습니다~~\n프로필 이미지 바꿈~~~',
-          created_by: 'hi6724@gmail.com',
-          email: 'hi6724@gmail.com',
-          board_comment_content: '키야 과일주스 중에선 수박주스가 짱이죠!',
-        },
-        {
-          profile_image: 'https://i.pinimg.com/564x/3e/ca/5b/3eca5b1a9acb1b957d534187737832dd.jpg',
-          board_comment_id: 1,
-          user_id: 4,
-          board_id: 6,
-          nickname: '수지',
-          created_at: '2022-11-22T04:49:45.000+00:00',
-          bio: '수지입니다.',
-          created_by: 'suji@gmail.com',
-          email: 'suji@gmail.com',
-          board_comment_content: '우와 너무 재밌을 것 같아요~',
-        },
-      ],
+      comments: [],
       isLoading: false,
       noImg: require('../assets/images/noImg.jpg'),
       defaultProfile: require('../assets/images/defaultProfile.jpg'),
     };
   },
   methods: {
+    showProfile(item) {
+      console.log(item);
+      this.$router.push(`/profile/${item.email}`);
+    },
     editComment(item) {
       if (this.toggleCommentEdit === -1) {
+        console.log(item);
         this.commentEdit = item.board_comment_content;
         this.toggleCommentEdit = item.board_comment_id;
         return;
@@ -286,14 +264,23 @@ export default {
         if (comment.board_comment_id !== item.board_comment_id) return comment;
         return { ...comment, board_comment_content: this.commentEdit };
       });
+      axios({
+        url: `${this.$store.state.baseUrl}board/comment/`,
+        method: 'PUT',
+        data: {
+          board_comment_content: this.commentEdit,
+          board_comment_id: item.board_comment_id,
+          created_by: this.userInfo.email,
+        },
+      });
       this.comments = newComments;
       this.toggleCommentEdit = -1;
     },
     deleteComment(item) {
-      // axios({
-      //   method: "DELETE",
-      //   url: `${this.$store.state.baseUrl}board/comment/${this.boardDetail.board_comment_id}`,
-      // })
+      axios({
+        method: 'DELETE',
+        url: `${this.$store.state.baseUrl}board/comment/${item.board_comment_id}`,
+      });
       const newComments = this.comments.filter((comment) => comment.board_comment_id !== item.board_comment_id);
       this.comments = newComments;
     },
@@ -314,15 +301,15 @@ export default {
         board_comment_content: this.commentContent,
       };
       this.comments = [newComment, ...this.comments];
-      // axios({
-      //   method: 'POST',
-      //   url: `${this.$store.state.baseUrl}board/comment`,
-      //   data: {
-      //     board_comment_content: this.commentContent,
-      //     board_id: this.boardDetail.board_id,
-      //     created_by: this.userInfo.email,
-      //   },
-      // });
+      axios({
+        method: 'POST',
+        url: `${this.$store.state.baseUrl}board/comment/`,
+        data: {
+          board_comment_content: this.commentContent,
+          board_id: this.boardDetail.board_id,
+          created_by: this.userInfo.email,
+        },
+      });
       this.commentContent = '';
     },
     handleDelete() {

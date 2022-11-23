@@ -23,22 +23,22 @@
             alt=""
             style="object-fit: cover"
           />
-          <h3 style="display: flex; align-items: center; gap: 0.3rem">
+          <h3 @click="toggleEdit" style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer">
             {{ userInfo.nickname }}
-            <b-icon @click="toggleEdit" icon="pencil-square"></b-icon>
+            <b-icon icon="pencil-square"></b-icon>
           </h3>
           <div class="profile-meta">
-            <div>
+            <div @click="showFollowing">
               <h5>팔로잉</h5>
-              <h6>1</h6>
+              <h6>{{ userInfo.following_count }}</h6>
             </div>
-            <div>
+            <div @click="showFollowed">
               <h5>팔로워</h5>
-              <h6>63k</h6>
+              <h6>{{ userInfo.followed_count }}</h6>
             </div>
-            <div>
+            <div @click="goBoard">
               <h5>게시글</h5>
-              <h6>21</h6>
+              <h6>{{ boards.length }}</h6>
             </div>
           </div>
           <p>
@@ -46,35 +46,18 @@
           </p>
         </div>
         <div>
-          <h2>내 버킷리스트</h2>
-          <div class="bucket-container">
-            <div class="inputGroup">
-              <input id="option1" name="option1" type="checkbox" />
-              <label for="option1">Option One</label>
-            </div>
+          <h2 style="display: flex; justify-content: space-between; align-items: center">
+            내 버킷리스트 <router-link style="font-size: 1rem" to="/regist/bucket">버킷리스트 쓰러가기</router-link>
+          </h2>
 
-            <div class="inputGroup">
-              <input id="option2" name="option2" type="checkbox" />
-              <label for="option2">Option Two</label>
-            </div>
-            <div class="inputGroup">
-              <input id="option3" name="option3" type="checkbox" />
-              <label for="option3">Option Two</label>
-            </div>
-            <div class="inputGroup">
-              <input id="option4" name="option4" type="checkbox" />
-              <label for="option4">Option Two</label>
-            </div>
-            <div class="inputGroup">
-              <input id="option5" name="option5" type="checkbox" />
-              <label for="option5">Option Two</label>
-            </div>
-            <div class="inputGroup">
-              <input id="option6" name="option6" type="checkbox" />
-              <label for="option6">Option Two</label>
+          <div v-for="(bucket, index) in buckets" :key="index" class="bucket-container" style="margin-bottom: 0.5rem">
+            <div class="inputGroup" style="cursor: default">
+              <input :id="index" name="option1" type="checkbox" :checked="bucket.check === 1" />
+              <label :for="index">{{ bucket.bucket_title }}</label>
             </div>
           </div>
-          <h2>우리 팀</h2>
+          <div v-if="buckets.length === 0">버킷리스트가 없습니다</div>
+          <h2 style="margin-top: 1rem">우리 팀</h2>
           <div class="team-container">
             <div class="team-card">
               <img :src="defaultTeamBg" alt="" />
@@ -84,26 +67,18 @@
               <img :src="defaultTeamBg" alt="" />
               <span>코코와의 버킷리스트 </span>
             </div>
-            <div class="team-card">
-              <img :src="defaultTeamBg" alt="" />
-              <span> 13반의 버킷리스트 </span>
-            </div>
-            <div class="team-card">
-              <img :src="defaultTeamBg" alt="" />
-              <span> 13반의 버킷리스트 </span>
-            </div>
-            <div class="team-card">
-              <img :src="defaultTeamBg" alt="" />
-              <span> 13반의 버킷리스트 </span>
-            </div>
-            <div class="team-card">
-              <img :src="defaultTeamBg" alt="" />
-              <span> 13반의 버킷리스트 </span>
-            </div>
           </div>
         </div>
       </section>
-      <section>내 게시글</section>
+      <section>
+        <h1 id="boards">내 게시글</h1>
+        <div v-for="(board, index) in boards" @click="() => showMore(board)" :key="index" class="board-container">
+          <img :src="board.board_image ? board.board_image : defaultBoardImg" alt="" />
+          <h3>{{ board.board_title }}</h3>
+          <span style="color: #868e96">{{ board.created_at }} 작성</span>
+          <p>{{ board.board_content }}</p>
+        </div>
+      </section>
     </section>
 
     <modal name="editModal" height="80%">
@@ -146,15 +121,32 @@
         </button>
       </div>
     </modal>
+    <modal name="followModal" :scrollable="true" :resizable="true" height="auto">
+      <div class="my-modal-content p-4" style="align-items: start; gap: 0.5rem">
+        <div class="followCard" v-for="(item, index) in followList" :key="index">
+          <div style="display: flex; align-items: center; gap: 1rem; font-family: 'maple'">
+            <img style="width: 5rem; height: 5rem" :src="item.profile_image" alt="" />
+            <h4>{{ item.nickname }}</h4>
+          </div>
+          <button @click="() => showProfile(item)" class="button-26" style="width: auto; font-family: maple">
+            자세히보기
+          </button>
+        </div>
+      </div>
+    </modal>
+    <FloatButton />
   </div>
 </template>
 <script>
 import { mapState } from 'vuex';
 import gsap from 'gsap';
 import axios from 'axios';
+import { timeUtil } from '@/utils/timeUtil';
+import FloatButton from '@/components/FloatButton.vue';
 
 export default {
   name: 'ProfileView',
+  components: { FloatButton },
   computed: {
     ...mapState('userStore', ['userInfo']),
     validForm() {
@@ -173,6 +165,9 @@ export default {
       profilePreview: '',
       defaultTeamBg: require('@/assets/images/teamBgDefault.jpg'),
       isLoading: false,
+      boards: [],
+      buckets: [],
+      followList: [],
       editForm: {
         nickname: '',
         bio: '',
@@ -181,8 +176,12 @@ export default {
     };
   },
 
-  mounted() {
-    window.scrollTo(0, 0);
+  async mounted() {
+    const myEl = document.getElementById('window-top');
+    this.$smoothScroll({
+      scrollTo: myEl,
+      duration: 0.5,
+    });
     gsap.to('.container', {
       delay: 0.1,
       duration: 1.6,
@@ -191,8 +190,46 @@ export default {
     });
     this.editForm.bio = this.userInfo.bio;
     this.editForm.nickname = this.userInfo.nickname;
+
+    const { data } = await axios({
+      url: `${this.$store.state.baseUrl}user/${this.userInfo.email}`,
+    });
+    this.boards = data.Boards.map((item) => {
+      return { ...item, created_at: timeUtil(item.created_at) };
+    });
+    this.buckets = data.Buckets;
   },
   methods: {
+    showProfile(item) {
+      this.$router.push(`/profile/${item.email}`);
+    },
+    async showFollowed() {
+      this.$modal.show('followModal');
+      const {
+        data: { Followed },
+      } = await axios({
+        url: `${this.$store.state.baseUrl}follow/followed/${this.userInfo.email}`,
+      });
+      this.followList = Followed;
+    },
+    async showFollowing() {
+      this.$modal.show('followModal');
+      const {
+        data: { Following },
+      } = await axios({
+        url: `${this.$store.state.baseUrl}follow/following/${this.userInfo.email}`,
+      });
+      this.followList = Following;
+    },
+    goBoard() {
+      this.$smoothScroll({
+        scrollTo: document.getElementById('boards'),
+        duration: 0.5,
+      });
+    },
+    showMore(item) {
+      this.$router.push(`/board/${item.board_id}`);
+    },
     toggleEdit() {
       this.$modal.show('editModal');
     },
@@ -243,6 +280,26 @@ export default {
 @import '../style/colors.scss';
 @import '../style/input.scss';
 @import '../style/button.scss';
+.followCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid $lightGray;
+}
+.board-container {
+  cursor: pointer;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $lightGray;
+  img {
+    width: 100%;
+  }
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
+}
 .bucket-container {
   display: flex;
   flex-direction: column;

@@ -14,17 +14,17 @@
             {{ userInfo.nickname }}
           </h3>
           <div class="profile-meta">
-            <div>
+            <div @click="showFollowing">
               <h5>팔로잉</h5>
-              <h6>1</h6>
+              <h6>{{ userInfo.following_count }}</h6>
             </div>
-            <div>
+            <div @click="showFollowed">
               <h5>팔로워</h5>
-              <h6>63k</h6>
+              <h6>{{ userInfo.followed_count }}</h6>
             </div>
-            <div>
+            <div @click="goBoard">
               <h5>게시글</h5>
-              <h6>21</h6>
+              <h6>{{ boards.length }}</h6>
             </div>
           </div>
           <p>
@@ -50,20 +50,36 @@
         </div>
       </section>
       <section>
-        <h1>{{ userInfo.nickname }}의 게시글</h1>
+        <h1 id="boards">{{ userInfo.nickname }}의 게시글</h1>
         <div v-for="(board, index) in boards" :key="index" class="board-container">
           <img :src="board.board_image ? board.board_image : defaultBoardImg" alt="" />
-          <h1>{{ board.board_title }}</h1>
+          <h3>{{ board.board_title }}</h3>
+          <span style="color: #868e96">{{ board.created_at }} 작성</span>
           <p>{{ board.board_content }}</p>
-          <span>{{ board.created_at }}</span>
+
+          <span style="cursor: pointer" @click="() => showMore(board)">자세히보기</span>
         </div>
       </section>
     </section>
+    <modal name="followModal" :scrollable="true" :resizable="true" height="auto">
+      <div class="my-modal-content p-4" style="align-items: start; gap: 0.5rem">
+        <div class="followCard" v-for="(item, index) in followList" :key="index">
+          <div style="display: flex; align-items: center; gap: 1rem; font-family: 'maple'">
+            <img style="width: 5rem; height: 5rem" :src="item.profile_image" alt="" />
+            <h4>{{ item.nickname }}</h4>
+          </div>
+          <button @click="() => showProfile(item)" class="button-26" style="width: auto; font-family: maple">
+            자세히보기
+          </button>
+        </div>
+      </div>
+    </modal>
   </div>
 </template>
 <script>
 import gsap from 'gsap';
 import axios from 'axios';
+import { timeUtil } from '@/utils/timeUtil';
 
 export default {
   name: 'ProfileView',
@@ -89,6 +105,7 @@ export default {
       },
       boards: [],
       buckets: [],
+      followList: [],
     };
   },
 
@@ -105,17 +122,58 @@ export default {
       url: `${this.$store.state.baseUrl}user/${this.$route.params.email}`,
     });
     this.userInfo = data.userInfo;
-    this.boards = data.Boards;
+
+    this.boards = data.Boards.map((item) => {
+      return { ...item, created_at: timeUtil(item.created_at) };
+    });
     this.buckets = data.Buckets;
-    console.log(data);
   },
-  methods: {},
+  methods: {
+    showMore(item) {
+      this.$router.push(`/board/${item.board_id}`);
+    },
+    goBoard() {
+      this.$smoothScroll({
+        scrollTo: document.getElementById('boards'),
+        duration: 0.5,
+      });
+    },
+    showProfile(item) {
+      this.$router.push(`/profile/${item.email}`);
+    },
+    async showFollowed() {
+      this.$modal.show('followModal');
+      const {
+        data: { Followed },
+      } = await axios({
+        url: `${this.$store.state.baseUrl}follow/followed/${this.userInfo.email}`,
+      });
+      this.followList = Followed;
+    },
+    async showFollowing() {
+      this.$modal.show('followModal');
+      const {
+        data: { Following },
+      } = await axios({
+        url: `${this.$store.state.baseUrl}follow/following/${this.userInfo.email}`,
+      });
+      this.followList = Following;
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
 @import '../style/colors.scss';
 @import '../style/input.scss';
 @import '../style/button.scss';
+.followCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid $lightGray;
+}
 .board-container {
   padding-bottom: 1rem;
   border-bottom: 1px solid $lightGray;

@@ -65,7 +65,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .header-container {
-  z-index: 99999;
+  z-index: 999;
   position: sticky;
   top: 0;
   width: 100vw;

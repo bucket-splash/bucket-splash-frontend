@@ -27,8 +27,10 @@ export default {
         accessToken,
       },
     });
-    console.log('Valid Token:', data);
-    if (data.message === 'fail') return;
+    if (data.message === 'fail') {
+      localStorage.removeItem('ssafy-token');
+      return;
+    }
     this.$store.dispatch('userStore/login', {
       userInfo: data.userInfo,
       token: accessToken,

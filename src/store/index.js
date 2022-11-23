@@ -14,7 +14,7 @@ export default new Vuex.Store({
     todoStore,
   },
   state: {
-    baseUrl: `http://70.12.50.130:8080/`,
+    baseUrl: `http://localhost:8080/`,
   },
   plugins: [
     createPersistedState({
