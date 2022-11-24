@@ -7,6 +7,8 @@ import SignupView from '../views/SignupView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import UserProfileView from '../views/UserProfileView.vue';
 import RegistView from '../views/RegistView.vue';
+import RegistBucketView from '../views/RegistBucketView.vue';
+import FollowBoardView from '../views/FollowBoardView.vue';
 
 Vue.use(VueRouter);
 
@@ -45,6 +47,21 @@ const routes = [
     path: '/regist',
     name: 'regist',
     component: RegistView,
+  },
+  {
+    path: '/regist/bucket',
+    name: 'registBucket',
+    component: RegistBucketView,
+  },
+  {
+    path: '/regist/recuruit',
+    name: 'registBucket',
+    component: RegistView,
+  },
+  {
+    path: '/follow',
+    name: 'followBoardList',
+    component: FollowBoardView,
   },
 ];
 

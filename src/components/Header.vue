@@ -11,9 +11,7 @@
         <b-nav-item @click="() => this.$router.push('/recruit')">모집중</b-nav-item>
         <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')">로그인</b-nav-item>
         <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/signup')">회원가입</b-nav-item>
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">우리팀</b-nav-item>
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">팔로우</b-nav-item>
-        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/recruit')">내버킷</b-nav-item>
+        <b-nav-item v-if="userInfo" @click="() => this.$router.push('/follow')">팔로우</b-nav-item>
         <b-nav-item v-if="userInfo" @click="() => this.$router.push('/profile')"
           ><img
             :src="userInfo.profile_image ? userInfo.profile_image : defaultProfile"

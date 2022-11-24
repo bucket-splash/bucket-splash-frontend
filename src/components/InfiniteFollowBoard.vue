@@ -13,7 +13,49 @@
           <b-dropdown-item @click="() => setFilter('date')">최신순</b-dropdown-item>
           <b-dropdown-item @click="() => setFilter('like')">좋아요순</b-dropdown-item>
         </b-dropdown>
-        <div class="bucket-container" v-for="(item, i) in boards" :key="i">
+        <div style="position: absolute; top: 1rem; left: 1rem; z-index: 9; display: flex; gap: 0.5rem">
+          <div v-for="(item, index) in followList" :key="index" style="position: relative; cursor: pointer">
+            <img
+              @click="() => setFollowFilter(item)"
+              v-if="item.profile_image"
+              :src="item.profile_image"
+              alt=""
+              style="width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover"
+            />
+            <p
+              @click="() => setFollowFilter(item)"
+              v-else
+              style="
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                background-color: black;
+                color: white;
+                overflow: hidden;
+                margin: 0;
+              "
+            >
+              {{ item.nickname }}
+            </p>
+            <!-- {{ item.email }} -->
+            <div
+              style="
+                border: 4px solid #03a9f4;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                background: transparent;
+                width: 3.5rem;
+                height: 3.5rem;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
+              "
+              v-if="item?.email == selectedId"
+            ></div>
+          </div>
+        </div>
+        <div class="bucket-container" v-for="(item, i) in filteredList" :key="i">
           <div style="cursor: pointer" @click="() => handleClick(item.board_id)">
             <img :src="item.board_image ? item.board_image : noImg" class="thumbnail" />
             <div class="bucket-content">
@@ -38,22 +80,21 @@
       </div>
     </div>
     <div class="empty">
-      <span v-if="finish">더 이상 로드할 게시글이 없습니다</span>
+      <span>더 이상 로드할 게시글이 없습니다</span>
     </div>
-    <InfiniteLoading v-if="!isLoading" @infinite="infiniteHandler" spinner="waveDots"></InfiniteLoading>
   </div>
 </template>
 <script>
+import axios from 'axios';
 import gsap from 'gsap';
 import InfiniteLoading from 'vue-infinite-loading';
 import { mapState } from 'vuex';
 
 export default {
-  name: 'InfiniteBoard',
+  name: 'InfiniteFollowBoard',
   components: { InfiniteLoading },
   data() {
     return {
-      buckets: [],
       isLoading: false,
       limit: 12,
       page: 2,
@@ -61,16 +102,28 @@ export default {
       noImg: require('../assets/images/noImg.jpg'),
       finish: false,
       filter: 'date',
+      selectedId: -1,
+      followList: [],
+      filteredList: [],
     };
   },
   methods: {
-    setFilter(filter) {
-      this.filter = filter;
-      this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter });
-      console.log(filter);
+    setFollowFilter(item) {
+      if (this.selectedId == item.email) {
+        this.selectedId = -1;
+        this.filteredList = this.followBoards;
+      } else {
+        this.selectedId = item.email;
+        console.log(this.followBoards);
+        this.filteredList = this.followBoards.filter((board) => board.email == this.selectedId);
+      }
     },
+
     async infiniteHandler($state) {
-      const result = await this.$store.dispatch('boardStore/getBoardList', { sortBy: this.filter });
+      const result = await this.$store.dispatch('boardStore/getBoardList', {
+        sortBy: this.filter,
+        email: this.userInfo.email,
+      });
       if (result) {
         $state.loaded();
         this.page += 1;
@@ -90,24 +143,43 @@ export default {
       }
       this.$router.push(`/profile/${item.email}`);
     },
+    async setFilter(filter) {
+      console.log(filter);
+      this.filter = filter;
+      await this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter, email: this.userInfo.email });
+      await this.$nextTick();
+      this.filteredList = this.followBoards;
+      console.log(this.filteredList);
+      if (this.selectedId != -1) {
+        this.filteredList = this.followBoards.filter((board) => board.email == this.selectedId);
+      }
+      console.log(filter);
+    },
   },
   async mounted() {
-    if (boards.length < 3) {
-      this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter });
+    if (!this.userInfo?.email) {
+      this.$router.push('/');
+      return;
     }
+    await this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter, email: this.userInfo.email });
+    const {
+      data: { Following },
+    } = await axios({
+      url: `${this.$store.state.baseUrl}follow/following/${this.userInfo.email}`,
+    });
+    this.followList = Following;
+    this.filteredList = this.followBoards;
+    console.log(this.followList);
   },
 
   computed: {
-    ...mapState('boardStore', ['boards']),
+    ...mapState('boardStore', ['followBoards']),
+    ...mapState('userStore', ['userInfo']),
   },
 
   watch: {
-    async boards(newValue, oldValue) {
-      console.log(this.isLoading);
-
-      if (this.isLoading) return;
+    async boards() {
       await this.$nextTick();
-
       gsap.fromTo(
         this.$refs.buckets.childNodes,
         {
@@ -124,18 +196,8 @@ export default {
           opacity: 1,
           y: 0,
           ease: 'power1.inOut',
-          duration: (index) => {
-            const delay = index / this.limit - (newValue.length - this.limit) / this.limit;
-            return delay >= 0 ? 0.6 : 0;
-          },
-          stagger: (index) => {
-            const delay = index / this.limit - (newValue.length - this.limit) / this.limit;
-            return delay >= 0 ? delay : 0;
-          },
-          onStart: () => (this.isLoading = true),
-          onComplete: () => {
-            this.isLoading = false;
-          },
+          duration: 0.6,
+          stagger: 0.2,
         }
       );
     },
@@ -194,6 +256,10 @@ export default {
   padding: 1rem 1rem 0.5rem;
   h1 {
     font-size: 1.5rem;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 .thumbnail {

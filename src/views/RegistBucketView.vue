@@ -75,21 +75,6 @@ export default {
       this.previewImg = URL.createObjectURL(this.uploadImg);
     },
     async handleSubmit() {
-      if (this.isLoading) return;
-      if (this.title.length < 5) {
-        this.$toast.open({
-          message: `제목을 5글자 이상 입력해주세요`,
-          type: 'error',
-        });
-        return;
-      }
-      if (this.content.length < 10) {
-        this.$toast.open({
-          message: `내용을 10글자 이상 입력해주세요`,
-          type: 'error',
-        });
-        return;
-      }
       this.isLoading = true;
 
       if (this.uploadImg) {

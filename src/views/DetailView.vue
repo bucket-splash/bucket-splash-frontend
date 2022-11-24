@@ -53,19 +53,29 @@
         <!-- 캐러셀 끗  -->
         <h2>{{ boardDetail.board_title }}</h2>
         <p>{{ boardDetail.board_content }}</p>
-        <div style="display: flex; gap: 0.7rem">
-          <span>
-            <b-icon color="red" icon="heart-fill" aria-hidden="true"></b-icon>
-          </span>
-          <span>
-            <b-icon icon="chat-dots" aria-hidden="true"></b-icon>
-          </span>
-          <span><b-icon icon="share-fill" aria-hidden="true"></b-icon></span>
-        </div>
-        <p style="font-size: 0.8rem">좋아요 {{ 13 }}개</p>
+
+        <p style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem">
+          <b-icon
+            @click="toggleLike"
+            v-if="isLiked"
+            style="width: 1rem; height: 1rem; cursor: pointer"
+            color="red"
+            icon="heart-fill"
+            aria-hidden="true"
+          ></b-icon>
+          <b-icon
+            @click="toggleLike"
+            v-else
+            style="width: 1rem; height: 1rem; cursor: pointer"
+            color="red"
+            icon="heart"
+            aria-hidden="true"
+          ></b-icon>
+          <span> 좋아요 {{ boardDetail.likes_count }}개 </span>
+        </p>
         <!-- 여기부터 댓글창 -->
         <div class="divider"></div>
-        <form style="position: relative" @submit="submitComment">
+        <form v-if="userInfo?.email" style="position: relative" @submit="submitComment">
           <input
             type="text"
             v-model="commentContent"
@@ -133,7 +143,7 @@
         </div>
       </div>
     </section>
-
+    <!-- 편집 모달 -->
     <modal name="editModal" height="80%">
       <div class="my-modal-content p-4">
         <label for="picture" style="cursor: pointer">
@@ -167,7 +177,6 @@
             name="editTitle"
             id="editTitle"
             v-model="editForm.board_title"
-            required
           />
           <label for="editTitle" class="form__label">{{ boardDetail.board_title }}</label>
         </div>
@@ -220,6 +229,13 @@ export default {
       console.log(item.created_at);
       return { ...item, created_at: timeUtil(item.created_at) };
     });
+    if (this.userInfo?.email) {
+      const likeRes = await axios({
+        method: 'GET',
+        url: `${this.$store.state.baseUrl}like/${data.board_id}/${this.userInfo.email}/`,
+      });
+      this.isLiked = likeRes.data;
+    }
   },
   data() {
     return {
@@ -242,6 +258,7 @@ export default {
       uploadImgUrl: '',
       toggleCommentEdit: -1,
       commentEdit: '',
+      isLiked: false,
       comments: [],
       isLoading: false,
       noImg: require('../assets/images/noImg.jpg'),
@@ -249,10 +266,35 @@ export default {
     };
   },
   methods: {
+    toggleLike() {
+      if (!this.userInfo?.email) {
+        this.$toast.open({
+          message: '좋아요를 누르려면 로그인 해 주세요',
+          type: 'warning',
+        });
+        return;
+      }
+      if (this.isLiked) {
+        this.boardDetail.likes_count -= 1;
+      } else {
+        this.boardDetail.likes_count += 1;
+      }
+      this.isLiked = !this.isLiked;
+      axios({
+        url: `${this.$store.state.baseUrl}like`,
+        method: 'POST',
+        data: {
+          board_id: this.boardDetail.board_id,
+          user_email: this.userInfo.email,
+        },
+      });
+      console.log('like');
+    },
     showProfile(item) {
       console.log(item);
       this.$router.push(`/profile/${item.email}`);
     },
+
     editComment(item) {
       if (this.toggleCommentEdit === -1) {
         console.log(item);
@@ -284,7 +326,7 @@ export default {
       const newComments = this.comments.filter((comment) => comment.board_comment_id !== item.board_comment_id);
       this.comments = newComments;
     },
-    submitComment(e) {
+    async submitComment(e) {
       e.preventDefault();
       if (this.commentContent.length < 5) {
         this.$toast.open({
@@ -296,12 +338,12 @@ export default {
       const newComment = {
         profile_image: this.userInfo.profile_image,
         nickname: this.userInfo.nickname,
-        created_at: '2022-11-22T04:50:51.000+00:00',
+        created_at: '0분 전',
         email: this.userInfo.email,
         board_comment_content: this.commentContent,
       };
       this.comments = [newComment, ...this.comments];
-      axios({
+      const { data } = await axios({
         method: 'POST',
         url: `${this.$store.state.baseUrl}board/comment/`,
         data: {
@@ -310,6 +352,8 @@ export default {
           created_by: this.userInfo.email,
         },
       });
+      console.log(data);
+      this.comments[0].board_comment_id = data.board_comment_id;
       this.commentContent = '';
     },
     handleDelete() {
@@ -346,6 +390,23 @@ export default {
       this.previewImg = URL.createObjectURL(this.uploadImg);
     },
     async handleSubmit() {
+      if (this.isLoading) return;
+      if (this.editForm.board_title.length < 5) {
+        this.$toast.open({
+          message: `제목을 5글자 이상 입력해주세요`,
+          type: 'error',
+        });
+        return;
+      }
+      if (this.editForm.board_content.length < 10) {
+        this.$toast.open({
+          message: `내용을 10글자 이상 입력해주세요`,
+          type: 'error',
+        });
+        return;
+      }
+      this.isLoading = true;
+
       if (this.uploadImg) {
         const form = new FormData();
         form.append('file', this.uploadImg);
@@ -373,6 +434,7 @@ export default {
       this.editForm.board_title = '';
       this.editForm.board_content = '';
       this.$modal.hide('editModal');
+      this.isLoading = false;
     },
   },
 };

@@ -39,22 +39,20 @@
               name="nickname"
               id="nickname"
               v-model="nickname"
-              required
             />
-            <label for="nickname" class="form__label">닉네임</label>
+            <label for="nickname" class="form__label">다른사람에게 보여질 닉네임</label>
           </div>
 
           <div class="form__group field">
             <input
               type="input"
               class="form__field"
-              placeholder="이메일"
+              placeholder="아이디(로그인용)"
               name="email"
               id="email"
               v-model="email"
-              required
             />
-            <label for="email" class="form__label">이메일</label>
+            <label for="email" class="form__label">아이디 (로그인용)</label>
           </div>
 
           <div class="form__group field">
@@ -65,7 +63,6 @@
               name="password"
               id="password"
               v-model="password"
-              required
             />
             <label for="password" class="form__label">비밀번호</label>
           </div>
@@ -78,7 +75,6 @@
               name="confirmPassword"
               id="confirmPassword"
               v-model="confirmPassword"
-              required
             />
             <label for="confirmPassword" class="form__label">비밀번호확인</label>
           </div>
@@ -124,9 +120,33 @@ export default {
   },
   computed: {
     validForm() {
+      if (this.nickname.length < 2 || this.nickname.length > 11) {
+        return {
+          value: false,
+          message: '닉네임은 2글자이상 10글자이하로 설정해주세요',
+        };
+      }
+      if (this.email.length < 3 || this.email.length > 11) {
+        return {
+          value: false,
+          message: '아이디는 3글자이상 10글자이하로 설정해주세요',
+        };
+      }
+      if (this.password.length < 3 || this.password.length > 11) {
+        return {
+          value: false,
+          message: '비밀번호는 3글자이상 10글자이하로 설정해주세요',
+        };
+      }
+      if (this.confirmPassword != this.password) {
+        return {
+          value: false,
+          message: `비밀번호를 확인해주세요`,
+        };
+      }
       return {
-        value: this.email.length > 4 && this.userId.length < 13,
-        message: 'ok',
+        value: true,
+        message: '굿!',
       };
     },
   },
@@ -139,7 +159,7 @@ export default {
       await this.$nextTick();
       if (this.uploadImg.size > 2097152) {
         this.$toast.open({
-          message: '파일의 크기가 너무 큽니다 (2MB이상)',
+          message: '파일의 크기가 너무 큽니다 (2MB이하만 가능합니다)',
           type: 'error',
         });
         return;
@@ -149,8 +169,15 @@ export default {
     },
     async handleSubmit(e) {
       e.preventDefault();
-      this.isLoading = true;
+      if (!this.validForm.value) {
+        this.$toast.open({
+          message: this.validForm.message,
+          type: 'error',
+        });
+        return;
+      }
 
+      this.isLoading = true;
       if (this.uploadImg) {
         const form = new FormData();
         form.append('file', this.uploadImg);
@@ -172,7 +199,7 @@ export default {
 
       if (data === 0) {
         this.$toast.open({
-          message: `${this.email}는 이미 존재하는 이메일 입니다`,
+          message: `${this.email}는 이미 존재하는 아이디 입니다`,
           type: 'error',
         });
         this.isLoading = false;

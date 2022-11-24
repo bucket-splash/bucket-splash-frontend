@@ -26,7 +26,7 @@ export default {
       this.$router.push('/regist');
     },
     registBucket() {
-      this.$router.push('/regist');
+      this.$router.push('/profile');
     },
     registRecruit() {
       this.$router.push('/regist');
@@ -37,6 +37,7 @@ export default {
         scrollTo: myEl,
         duration: 0.5,
       });
+      this.$store.dispatch('boardStore/initBoard');
     },
   },
   computed: {

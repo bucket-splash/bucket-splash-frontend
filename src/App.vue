@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header></Header>
-    <router-view />
+    <router-view :key="$route.fullPath" />
     <Footer>asd</Footer>
   </div>
 </template>
@@ -27,7 +27,8 @@ export default {
         accessToken,
       },
     });
-    if (data.message === 'fail') {
+    console.log('DATA', data);
+    if (data.message == 'fail') {
       localStorage.removeItem('ssafy-token');
       return;
     }

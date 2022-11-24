@@ -5,7 +5,7 @@ import createPersistedState from 'vuex-persistedstate';
 import boardStore from '@/store/modules/boardStore';
 import userStore from '@/store/modules/userStore';
 import todoStore from '@/store/modules/todoStore';
-
+export const baseUrl = `http://localhost:8080/`;
 Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {

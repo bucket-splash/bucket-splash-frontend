@@ -11,7 +11,11 @@
             style="object-fit: cover"
           />
           <h3 style="display: flex; align-items: center; gap: 0.3rem">
-            {{ userInfo.nickname }}
+            <span>{{ userInfo.nickname }}</span>
+            <button @click="toggleFollow" v-if="this.$store?.state?.userStore?.userInfo" :disabled="isLoading">
+              <span v-if="!isFollowing">팔로우</span>
+              <span v-else>언팔로우</span>
+            </button>
           </h3>
           <div class="profile-meta">
             <div @click="showFollowing">
@@ -40,24 +44,24 @@
             </div>
           </div>
           <div v-if="buckets.length === 0">버킷리스트가 없습니다</div>
-          <h2 style="margin-top: 1rem">{{ userInfo.nickname }}의 팀</h2>
+          <!-- <h2 style="margin-top: 1rem">{{ userInfo.nickname }}의 팀</h2>
           <div class="team-container">
             <div class="team-card">
               <img :src="defaultTeamBg" alt="" />
               <span> 13반의 버킷리스트 </span>
             </div>
-          </div>
+          </div> -->
+          <div style="height: 4rem"></div>
         </div>
       </section>
       <section>
+        <div style="height: 4rem"></div>
         <h1 id="boards">{{ userInfo.nickname }}의 게시글</h1>
-        <div v-for="(board, index) in boards" :key="index" class="board-container">
+        <div @click="() => showMore(board)" v-for="(board, index) in boards" :key="index" class="board-container">
           <img :src="board.board_image ? board.board_image : defaultBoardImg" alt="" />
           <h3>{{ board.board_title }}</h3>
           <span style="color: #868e96">{{ board.created_at }} 작성</span>
           <p>{{ board.board_content }}</p>
-
-          <span style="cursor: pointer" @click="() => showMore(board)">자세히보기</span>
         </div>
       </section>
     </section>
@@ -93,7 +97,7 @@ export default {
       defaultProfileImg: require('@/assets/images/defaultProfile.jpg'),
       defaultBoardImg: require('@/assets/images/noImg.jpg'),
       isLoading: false,
-
+      isFollowing: false,
       userInfo: {
         bio: null,
         email: null,
@@ -110,6 +114,7 @@ export default {
   },
 
   async mounted() {
+    this.isLoading = true;
     window.scrollTo(0, 0);
     gsap.to('.container', {
       delay: 0.1,
@@ -127,8 +132,38 @@ export default {
       return { ...item, created_at: timeUtil(item.created_at) };
     });
     this.buckets = data.Buckets;
+    if (this.$store.state.userStore?.userInfo?.email) {
+      const res = await axios({
+        method: 'GET',
+        url: `${this.$store.state.baseUrl}follow/${this.$store.state.userStore.userInfo.email}/${this.userInfo.email}`,
+      });
+      this.isFollowing = res.data;
+    }
+    this.isLoading = false;
   },
   methods: {
+    async toggleFollow() {
+      if (this.isLoading) return;
+      this.isLoading = true;
+      if (this.isFollowing) {
+        this.userInfo.followed_count -= 1;
+        this.$store.state.userStore.userInfo.following_count -= 1;
+      } else {
+        this.userInfo.followed_count += 1;
+        this.$store.state.userStore.userInfo.following_count += 1;
+      }
+
+      this.isFollowing = !this.isFollowing;
+      await axios({
+        url: `${this.$store.state.baseUrl}follow`,
+        method: 'POST',
+        data: {
+          followed_email: this.userInfo.email,
+          following_email: this.$store.state.userStore.userInfo.email,
+        },
+      });
+      this.isLoading = false;
+    },
     showMore(item) {
       this.$router.push(`/board/${item.board_id}`);
     },
@@ -175,10 +210,15 @@ export default {
   border-bottom: 1px solid $lightGray;
 }
 .board-container {
+  cursor: pointer;
   padding-bottom: 1rem;
   border-bottom: 1px solid $lightGray;
   img {
     width: 100%;
+  }
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
   }
 }
 .bucket-container {

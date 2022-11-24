@@ -4,26 +4,10 @@
       <div class="inner-wrapper">
         <h1>로그인</h1>
 
-        <form
-          style="
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-          "
-          @submit="handleSubmit"
-        >
+        <form style="width: 100%; display: flex; flex-direction: column; align-items: center" @submit="handleSubmit">
           <div class="form__group field">
-            <input
-              type="input"
-              class="form__field"
-              placeholder="이메일"
-              name="email"
-              id="email"
-              v-model="email"
-              required
-            />
-            <label for="email" class="form__label">이메일</label>
+            <input type="input" class="form__field" placeholder="아이디" name="email" id="email" v-model="email" />
+            <label for="email" class="form__label">아이디</label>
           </div>
 
           <div class="form__group field">
@@ -34,13 +18,10 @@
               name="password"
               id="password"
               v-model="password"
-              required
             />
             <label for="password" class="form__label">비밀번호</label>
           </div>
-          <button class="button-26 my-4" :disabled="isLoading" role="button">
-            로그인
-          </button>
+          <button class="button-26 my-4" :disabled="isLoading" role="button">로그인</button>
         </form>
         <div class="divider"></div>
         <!-- HTML !-->
@@ -75,15 +56,35 @@ export default {
   },
   computed: {
     validForm() {
+      if (this.email < 3 || this.email > 11) {
+        return {
+          value: false,
+          message: '아이디는 3글자이상 10글자 이하입니다.',
+        };
+      }
+
+      if (this.password.length < 3 || this.password.length > 11) {
+        return {
+          value: false,
+          message: '비밀번호는 3글자이상 10글자 이하입니다.',
+        };
+      }
+
       return {
-        value: this.email.length > 4 && this.userId.length < 13,
-        message: 'ok',
+        value: true,
       };
     },
   },
   methods: {
     async handleSubmit(e) {
       e.preventDefault();
+      if (!this.validForm.value) {
+        this.$toast.open({
+          message: this.validForm.message,
+          type: 'error',
+        });
+        return;
+      }
       this.isLoading = true;
       const { data } = await axios({
         url: this.$store.state.baseUrl + 'user/login',
@@ -95,7 +96,7 @@ export default {
       });
       if (data.message === 'fail') {
         this.$toast.open({
-          message: '이메일 혹은 비밀번호가 옳바르지 않습니다',
+          message: '아이디 혹은 비밀번호가 옳바르지 않습니다',
           type: 'error',
         });
       } else {
