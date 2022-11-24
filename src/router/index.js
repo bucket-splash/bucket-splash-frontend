@@ -7,35 +7,37 @@ import SignupView from '../views/SignupView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import UserProfileView from '../views/UserProfileView.vue';
 import RegistView from '../views/RegistView.vue';
+import RegistRecruitView from '../views/RegistRecruitView.vue';
 import RegistBucketView from '../views/RegistBucketView.vue';
 import FollowBoardView from '../views/FollowBoardView.vue';
+import RecruitBoardView from '../views/RecruitBoardView.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'HomeView',
     component: HomeView,
   },
   {
     path: '/board/:id',
-    name: 'detail',
+    name: 'DetailView',
     component: DetailView,
   },
   {
     path: '/login',
-    name: 'login',
+    name: 'LoginView',
     component: LoginView,
   },
   {
     path: '/signup',
-    name: 'signup',
+    name: 'SignupView',
     component: SignupView,
   },
   {
     path: '/profile',
-    name: 'profile',
+    name: 'ProfileView',
     component: ProfileView,
   },
   {
@@ -45,23 +47,33 @@ const routes = [
   },
   {
     path: '/regist',
-    name: 'regist',
+    name: 'RegistView',
     component: RegistView,
   },
   {
     path: '/regist/bucket',
-    name: 'registBucket',
+    name: 'RegistBucketView',
     component: RegistBucketView,
   },
   {
     path: '/regist/recuruit',
-    name: 'registBucket',
+    name: 'RegistView',
     component: RegistView,
   },
   {
     path: '/follow',
-    name: 'followBoardList',
+    name: 'FollowBoardView',
     component: FollowBoardView,
+  },
+  {
+    path: '/recruit',
+    name: 'RecruitBoardView',
+    component: RecruitBoardView,
+  },
+  {
+    path: '/regist/recruit',
+    name: 'RegistRecruitView',
+    component: RegistRecruitView,
   },
 ];
 

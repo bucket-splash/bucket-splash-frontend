@@ -92,7 +92,7 @@ export default {
     },
   },
   async mounted() {
-    if (boards.length < 3) {
+    if (this.boards.length < 3) {
       this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter });
     }
   },

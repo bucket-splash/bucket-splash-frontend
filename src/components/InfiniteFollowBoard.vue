@@ -1,6 +1,6 @@
 <template lang="">
   <div>
-    <div class="wrapper">
+    <div v-if="followList.length > 0" class="wrapper">
       <div class="item-container" ref="buckets" style="padding-top: 6rem; position: relative">
         <b-dropdown
           id="dropdown-right"
@@ -79,7 +79,10 @@
         </div>
       </div>
     </div>
-    <div class="empty">
+    <div v-if="followList.length == 0" class="empty">
+      <span>먼저 유저를 팔로잉 해주세요</span>
+    </div>
+    <div v-else class="empty">
       <span>더 이상 로드할 게시글이 없습니다</span>
     </div>
   </div>

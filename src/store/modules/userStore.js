@@ -25,7 +25,9 @@ const userStore = {
   },
   actions: {
     login({ state }, data) {
-      localStorage.setItem('ssafy-token', data.token);
+      if (data.token) {
+        localStorage.setItem('ssafy-token', data.token);
+      }
       state.userInfo = data.userInfo;
     },
     logout({ state }) {

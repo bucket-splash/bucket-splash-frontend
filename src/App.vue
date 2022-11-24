@@ -3,11 +3,13 @@
     <Header></Header>
     <router-view :key="$route.fullPath" />
     <Footer>asd</Footer>
+    <FloatButton />
   </div>
 </template>
 <script>
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
+import FloatButton from '@/components/FloatButton.vue';
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 export default {
@@ -15,6 +17,7 @@ export default {
   components: {
     Header,
     Footer,
+    FloatButton,
   },
   async created() {
     this.$router.push('/');
@@ -32,6 +35,7 @@ export default {
       localStorage.removeItem('ssafy-token');
       return;
     }
+
     this.$store.dispatch('userStore/login', {
       userInfo: data.userInfo,
       token: accessToken,

@@ -2,18 +2,16 @@
   <div>
     <LandingView />
     <InfiniteBoard />
-    <FloatButton />
   </div>
 </template>
 
 <script>
 import LandingView from '@/components/LandingView.vue';
 import InfiniteBoard from '@/components/InfiniteBoard.vue';
-import FloatButton from '@/components/FloatButton.vue';
 import { mapState } from 'vuex';
 export default {
   name: 'HomeView',
-  components: { LandingView, InfiniteBoard, FloatButton },
+  components: { LandingView, InfiniteBoard },
   computed: {
     ...mapState('userStore', ['userInfo']),
   },

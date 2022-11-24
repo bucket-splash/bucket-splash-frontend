@@ -29,7 +29,7 @@ export default {
       this.$router.push('/profile');
     },
     registRecruit() {
-      this.$router.push('/regist');
+      this.$router.push('/regist/recruit');
     },
     goUp() {
       const myEl = document.getElementById('window-top');

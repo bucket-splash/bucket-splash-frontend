@@ -42,7 +42,7 @@
             </div>
           </div>
           <p>
-            {{ userInfo.bio?.length < 1 ? userInfo.bio : '자기소개가 없습니다' }}
+            {{ userInfo.bio?.length > 1 ? userInfo.bio : '자기소개가 없습니다' }}
           </p>
         </div>
         <div>
@@ -138,6 +138,7 @@
           </div>
 
           <div v-if="buckets.length === 0">버킷리스트가 없습니다</div>
+
           <!-- <h2 style="margin-top: 1rem">우리 팀</h2>
           <div class="team-container">
             <div class="team-card">
@@ -149,6 +150,7 @@
               <span>코코와의 버킷리스트 </span>
             </div>
           </div> -->
+
           <div style="height: 4rem"></div>
         </div>
       </section>
@@ -213,15 +215,6 @@
         >
           수정하기
         </button>
-        <button
-          style="background-color: tomato; font-family: maple"
-          @click="deleteUser"
-          class="button-26 mt-2"
-          :disabled="isLoading || !validForm"
-          role="button"
-        >
-          회원탈퇴
-        </button>
       </div>
     </modal>
     <modal name="followModal" :scrollable="true" :resizable="true" height="auto">
@@ -241,7 +234,6 @@
         </div>
       </div>
     </modal>
-    <FloatButton />
   </div>
 </template>
 <script>
@@ -249,11 +241,9 @@ import { mapState } from 'vuex';
 import gsap from 'gsap';
 import axios from 'axios';
 import { timeUtil } from '@/utils/timeUtil';
-import FloatButton from '@/components/FloatButton.vue';
 
 export default {
   name: 'ProfileView',
-  components: { FloatButton },
   computed: {
     ...mapState('userStore', ['userInfo']),
     validForm() {
@@ -299,6 +289,9 @@ export default {
 
     const { data } = await axios({
       url: `${this.$store.state.baseUrl}user/${this.userInfo.email}`,
+    });
+    this.$store.dispatch('userStore/login', {
+      userInfo: data.userInfo,
     });
     this.boards = data.Boards.map((item) => {
       return { ...item, created_at: timeUtil(item.created_at) };
