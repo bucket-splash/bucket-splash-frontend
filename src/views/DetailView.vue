@@ -356,15 +356,18 @@ export default {
       this.comments[0].board_comment_id = data.board_comment_id;
       this.commentContent = '';
     },
-    handleDelete() {
-      axios({
+    async handleDelete() {
+      await axios({
         method: 'DELETE',
         url: `${this.$store.state.baseUrl}board/${this.boardDetail.board_id}`,
       });
-      this.$router.push('/');
+      await this.$store.dispatch('boardStore/initBoard', { sortBy: 'date', email: '' });
+      this.$router.go(-1);
     },
     showModal() {
       this.$modal.show('editModal');
+      this.editForm.board_content = this.boardDetail.board_content;
+      this.editForm.board_title = this.boardDetail.board_title;
     },
     seeProfile() {
       if (this.boardDetail.email === this.userInfo?.email) {
@@ -415,7 +418,7 @@ export default {
         this.uploadImgUrl = data.url;
       }
 
-      axios({
+      await axios({
         method: 'PUT',
         url: this.$store.state.baseUrl + 'board',
         data: {
@@ -426,8 +429,9 @@ export default {
           board_id: this.boardDetail.board_id,
         },
       });
+      await this.$store.dispatch('boardStore/initBoard', { sortBy: 'date', email: '' });
 
-      this.boardDetail.board_image = this.uploadImgUrl;
+      this.boardDetail.board_image = this.uploadImgUrl ? this.uploadImgUrl : this.boardDetail.board_image;
       this.boardDetail.board_title = this.editForm.board_title;
       this.boardDetail.board_content = this.editForm.board_content;
       this.uploadImgUrl = '';
@@ -437,6 +441,7 @@ export default {
       this.isLoading = false;
     },
   },
+  mounted() {},
 };
 </script>
 <style lang="scss" scoped>

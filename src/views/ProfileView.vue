@@ -150,6 +150,77 @@
               <span>코코와의 버킷리스트 </span>
             </div>
           </div> -->
+          <h2 style="margin: 2rem 0">내가올린 모집글</h2>
+          <div>
+            <div
+              style="border-radius: 0.5rem; padding: 1rem; box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px"
+              v-for="(item, index) in recruitList"
+              :key="index"
+            >
+              <h3
+                @click="
+                  () => {
+                    if (focusId == index) {
+                      focusId = -1;
+                    } else {
+                      focusId = index;
+                    }
+                  }
+                "
+                style="cursor: pointer; color: #007bff"
+              >
+                {{ item.recruitInfo.recruit_title }}
+              </h3>
+              <div v-if="focusId == index">
+                <div style="display: flex; flex-direction: row-reverse">작성일 : {{ item.recruitInfo.created_at }}</div>
+                <div class="grid-container">
+                  <div>
+                    모집인원 <span>{{ item.applyedInfo.length }}/{{ item.recruitInfo.people_num }}</span>
+                  </div>
+                  <div v-if="item.recruitInfo.start_date != item.recruitInfo.end_date">
+                    시작일
+                    <span>
+                      {{ item.recruitInfo.start_date }}
+                    </span>
+                  </div>
+                  <div v-if="item.recruitInfo.start_date != item.recruitInfo.end_date">
+                    종료일
+                    <span>
+                      {{ item.recruitInfo.end_date }}
+                    </span>
+                  </div>
+                  <div v-else>일정 {{ item.recruitInfo.start_date }} 당일치기</div>
+                  <div>
+                    예약금 <span>{{ item.recruitInfo.deposit }}원</span>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <h4>모집내용</h4>
+                <p>
+                  {{ item.recruitInfo?.recruit_content ? item.recruitInfo.recruit_content : 'Loading...' }}
+                </p>
+
+                <div class="divider"></div>
+                <div class="apply-container">
+                  <h4>지원현황</h4>
+                  <div class="profile-container">
+                    <img
+                      style="object-fit: cover"
+                      v-for="(item, index) in item.applyedInfo"
+                      :key="index"
+                      :src="item.profile_image ? item.profile_image : defaultProfile"
+                    />
+                    <p v-if="item.applyedInfo.length === 0">아직 지원자가 없습니다</p>
+                  </div>
+                </div>
+                <div style="margin-top: 2rem" class="divider"></div>
+
+                <div style="display: flex; justify-content: center; align-items: center; height: 5rem">
+                  <button style="z-index: 999; background-color: #35d8ac" class="button-26">팀 확정하기</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div style="height: 4rem"></div>
         </div>
@@ -263,9 +334,11 @@ export default {
       profilePreview: '',
       defaultTeamBg: require('@/assets/images/teamBgDefault.jpg'),
       isLoading: false,
+      focusId: -1,
       boards: [],
       buckets: [],
       followList: [],
+      recruitList: [],
       bucketEdit: '',
       toggleEditBucket: -1,
       registBucket: null,
@@ -297,6 +370,21 @@ export default {
       return { ...item, created_at: timeUtil(item.created_at) };
     });
     this.buckets = data.Buckets;
+
+    const res = await axios({
+      url: `${this.$store.state.baseUrl}recruit/user/${this.userInfo.email}`,
+    });
+    this.recruitList = res.data.map((data) => {
+      return {
+        ...data,
+        recruitInfo: {
+          ...data.recruitInfo,
+          start_date: timeUtil(data.recruitInfo.start_date),
+          created_at: timeUtil(data.recruitInfo.created_at),
+          end_date: timeUtil(data.recruitInfo.end_date),
+        },
+      };
+    });
   },
   methods: {
     deleteUser() {
@@ -503,6 +591,34 @@ export default {
 @import '../style/colors.scss';
 @import '../style/input.scss';
 @import '../style/button.scss';
+
+.apply-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  img {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+  }
+  .profile-container {
+    display: flex;
+    gap: 1rem;
+  }
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin: 1rem 0;
+  div {
+    display: flex;
+    justify-content: space-between;
+    span {
+      font-family: maple-bold;
+    }
+  }
+}
 .followCard {
   width: 100%;
   display: flex;
@@ -608,7 +724,7 @@ export default {
     border-radius: 50%;
     aspect-ratio: 1;
     object-fit: contain;
-    background: tomato;
+    background: beige;
   }
   h3 {
     button {

@@ -16,6 +16,17 @@
             일정
             <date-picker format="YYYY-MM-DD HH:mm:ss" :range="true" v-model="time" valueType="format"></date-picker>
           </div>
+          <div style="grid-column-start: 1; grid-column-end: -1">
+            카테고리
+            <b-dropdown right :text="categories[categoryId]">
+              <b-dropdown-item
+                @click="() => (categoryId = item)"
+                v-for="(item, index) in [1, 2, 3, 4, 5, 6]"
+                :key="index"
+                >{{ categories[item] }}</b-dropdown-item
+              >
+            </b-dropdown>
+          </div>
         </div>
         <h4>모집내용</h4>
         <b-form-textarea
@@ -92,6 +103,15 @@ export default {
       title: '',
       personNum: 1,
       deposit: 0,
+      categoryId: 6,
+      categories: {
+        1: '스포츠/피트니스',
+        2: '어학',
+        3: '요리/음료/맛집',
+        4: '재테크/투자',
+        5: '교양',
+        6: '기타',
+      },
     };
   },
   methods: {
@@ -107,11 +127,11 @@ export default {
       this.isLoading = true;
       // 2022-11-24T07:11:04.229Z
       console.log(this.time[0].split(' ')[0] + 'T00:00:00.000Z');
-      axios({
+      await axios({
         url: `${this.$store.state.baseUrl}recruit`,
         method: 'POST',
         data: {
-          category_id: 1,
+          category_id: this.categoryId,
           recruit_title: this.title,
           recruit_content: this.content,
           people_num: this.personNum,

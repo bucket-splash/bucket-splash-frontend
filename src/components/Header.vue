@@ -12,12 +12,12 @@
             :src="userInfo.profile_image ? userInfo.profile_image : defaultProfile"
             style="height: 2rem; width: 2rem; border-radius: 50%; object-fit: cover"
         /></b-nav-item>
-
+        <!-- 
         <b-nav-form style="position: relative">
           <b-form-input style="padding-right: 2rem; opacity: 0; width: 0" aria-label="Input" class="header-input">
           </b-form-input>
           <b-icon @click="handleClick" icon="search" font-scale="1.5rem" class="search-icon"></b-icon>
-        </b-nav-form>
+        </b-nav-form> -->
       </b-nav>
     </div>
   </div>

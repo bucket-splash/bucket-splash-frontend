@@ -17,7 +17,9 @@
           <div style="cursor: pointer" @click="() => handleClick(item.board_id)">
             <img :src="item.board_image ? item.board_image : noImg" class="thumbnail" />
             <div class="bucket-content">
-              <h1>{{ item.board_title }}</h1>
+              <h1 style="width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
+                {{ item.board_title }}
+              </h1>
               <p class="bucket-text">{{ item.board_content }}</p>
               <p class="bucket-time">{{ item.created_at }} · {{ item.comments_count }}개의 댓글</p>
             </div>

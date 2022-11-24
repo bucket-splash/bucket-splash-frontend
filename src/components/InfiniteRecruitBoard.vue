@@ -34,8 +34,16 @@
               모집인원 <span>{{ recruitDetail.applyed.length }}/{{ recruitDetail.recruitInfo.people_num }}</span>
             </div>
             <div v-if="recruitDetail.recruitInfo.start_date != recruitDetail.recruitInfo.end_date">
-              일정
-              <span> {{ recruitDetail.recruitInfo.start_date }} ~ {{ recruitDetail.recruitInfo.end_date }} </span>
+              시작일
+              <span>
+                {{ recruitDetail.recruitInfo.start_date }}
+              </span>
+            </div>
+            <div v-if="recruitDetail.recruitInfo.start_date != recruitDetail.recruitInfo.end_date">
+              종료일
+              <span>
+                {{ recruitDetail.recruitInfo.end_date }}
+              </span>
             </div>
             <div v-else>일정 {{ recruitDetail.recruitInfo.start_date }} 당일치기</div>
             <div>
@@ -206,9 +214,7 @@ export default {
     };
   },
   async mounted() {
-    if (this.recruitList.length < 1) {
-      this.$store.dispatch('recruitStore/getRecruitList');
-    }
+    this.$store.dispatch('recruitStore/getRecruitList');
   },
   computed: {
     ...mapState('recruitStore', ['recruitList']),

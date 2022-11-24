@@ -105,14 +105,16 @@ export default {
         created_by: this.$store.state.userStore.userInfo.email,
         board_image: this.uploadImgUrl,
       };
-      axios({
+      await axios({
         method: 'POST',
         url: this.$store.state.baseUrl + 'board',
         data: boardData,
       });
 
+      await this.$store.dispatch('boardStore/initBoard', { sortBy: 'date', email: '' });
+
       this.isLoading = false;
-      this.$router.push('/');
+      this.$router.go(-1);
     },
   },
 };

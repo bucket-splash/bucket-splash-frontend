@@ -195,16 +195,15 @@ export default {
           password: this.password,
           profile_image: this.uploadImgUrl,
         },
-      });
-
-      if (data === 0) {
+      }).catch(() => {
         this.$toast.open({
           message: `${this.email}는 이미 존재하는 아이디 입니다`,
           type: 'error',
         });
         this.isLoading = false;
         return;
-      }
+      });
+
       const login = await axios({
         url: this.$store.state.baseUrl + 'user/login',
         method: 'POST',

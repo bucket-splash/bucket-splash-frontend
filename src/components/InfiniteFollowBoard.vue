@@ -13,7 +13,20 @@
           <b-dropdown-item @click="() => setFilter('date')">최신순</b-dropdown-item>
           <b-dropdown-item @click="() => setFilter('like')">좋아요순</b-dropdown-item>
         </b-dropdown>
-        <div style="position: absolute; top: 1rem; left: 1rem; z-index: 9; display: flex; gap: 0.5rem">
+        <div
+          style="
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 9;
+            display: flex;
+            gap: 0.5rem;
+            overflow-y: hidden;
+            overflow-x: scroll;
+            width: calc(100% - 10rem);
+            height: 4.3rem;
+          "
+        >
           <div v-for="(item, index) in followList" :key="index" style="position: relative; cursor: pointer">
             <img
               @click="() => setFollowFilter(item)"
@@ -165,6 +178,7 @@ export default {
       return;
     }
     await this.$store.dispatch('boardStore/initBoard', { sortBy: this.filter, email: this.userInfo.email });
+
     const {
       data: { Following },
     } = await axios({
