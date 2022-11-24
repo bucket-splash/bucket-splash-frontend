@@ -1,12 +1,7 @@
 <template lang="">
   <div @click="test" class="header-container">
     <div class="container">
-      <img
-        src="https://www.peengler.com/wp-content/uploads/logo-de-peengler.png"
-        alt=""
-        style="cursor: pointer"
-        @click="() => this.$router.push('/')"
-      />
+      <img src="/logo.png" alt="" style="cursor: pointer; height: 9rem" @click="() => this.$router.push('/')" />
       <b-nav style="align-items: center">
         <b-nav-item @click="() => this.$router.push('/recruit')">모집중</b-nav-item>
         <b-nav-item v-if="!userInfo" @click="() => this.$router.push('/login')">로그인</b-nav-item>
@@ -63,6 +58,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .header-container {
+  overflow: hidden;
   z-index: 999;
   position: sticky;
   top: 0;

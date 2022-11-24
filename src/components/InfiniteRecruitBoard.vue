@@ -53,6 +53,7 @@
             <h4>지원현황</h4>
             <div class="profile-container">
               <img
+                style="object-fit: cover"
                 v-for="(item, index) in recruitDetail.applyed"
                 :key="index"
                 :src="item.profile_image ? item.profile_image : defaultProfile"
@@ -152,6 +153,7 @@
             () => {
               $modal.hide('applyModal');
               focusId = -1;
+              this.applyMessage = '';
             }
           "
           class="button-26 mt-2"
@@ -266,11 +268,11 @@ export default {
         },
       });
 
-      console.log(this.userInfo);
       this.recruitDetail.applyed = [...this.recruitDetail.applyed, this.userInfo];
       this.$modal.hide('applyModal');
       this.isApplyed = true;
-      console.log('good');
+
+      this.applyMessage = '';
     },
   },
 };

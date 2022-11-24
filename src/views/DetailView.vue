@@ -80,7 +80,7 @@
             type="text"
             v-model="commentContent"
             class="my-input"
-            style="width: 100%; padding-right: 4rem; height: 4rem"
+            style="width: 100%; padding-right: 8rem; height: 4rem"
           />
           <b-button
             type="submit"
